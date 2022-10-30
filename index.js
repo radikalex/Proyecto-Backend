@@ -11,4 +11,4 @@ app.use('/orders', require('./routes/orders'));
 app.use('/reviews', require('./routes/reviews'));
 
 
-app.listen(PORT, () => console.log('servidor levantado en el puerto' + PORT))
+app.listen(PORT, () => console.log('Servidor levantado en el puerto ' + PORT))
