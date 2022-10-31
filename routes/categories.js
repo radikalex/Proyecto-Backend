@@ -8,5 +8,6 @@ router.put("/updateCategoryById/id/:id", CategoryController.updateCategoryById);
 router.delete("/deleteCategoryById/id/:id", CategoryController.deleteCategory);
 router.get("/getCategoryById/id/:id", CategoryController.getCategoryById);
 router.get("/getCategoriesByName/name/:name", CategoryController.getCategoriesByName);
+router.get("/getCategoriesProducts", CategoryController.getCategoriesProducts);
 
 module.exports = router

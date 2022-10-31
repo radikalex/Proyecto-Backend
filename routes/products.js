@@ -21,7 +21,8 @@ router.put("/updateProductById/id/:id", upload.single('img_product'), ProductCon
 router.delete("/deleteProductById/id/:id", ProductController.deleteProduct);
 
 router.get("/getProductById/id/:id", ProductController.getProductById);
-
-router.get("/getProductsByName/name/:name", ProductController.getProductByName);
+router.get("/getProductsByName/name/:name", ProductController.getProductsByName);
+router.get("/getProductsByPrice/price/:price", ProductController.getProductsByPrice);
+router.get("/getProductsPriceDesc", ProductController.getProductsPriceDesc);
 
 module.exports = router

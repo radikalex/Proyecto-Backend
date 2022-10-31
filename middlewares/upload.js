@@ -5,6 +5,7 @@ const path = require('path');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = path.resolve('./uploads');
+    console.log(dir);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
@@ -16,6 +17,7 @@ const storage = multer.diskStorage({
     req.body.img_product = filename;
   },
 });
+
 const upload = multer({ storage: storage  })
 
 module.exports = upload;
