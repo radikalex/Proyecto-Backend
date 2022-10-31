@@ -1,5 +1,8 @@
 const { Product, Category, Sequelize } = require("../models/index");
 const { Op } = Sequelize;
+const { unlink } = require("fs/promises");
+const path = require('path');
+const { log } = require("console");
 
 const ProductController = {
     async getProducts(req, res) {
@@ -15,7 +18,7 @@ const ProductController = {
     },
     async createProduct(req, res) {
         try {
-            req.body.img_product = req.file.filename;
+            console.log(req.body);
             const product = await Product.create(req.body);
             res.status(201).send({msg: "Product added", product})
         } catch (error) {
@@ -51,6 +54,9 @@ const ProductController = {
     },
     async deleteProduct(req, res) {
         try {
+            const product = await Product.findByPk(req.params.id);
+            const dir = path.resolve('./uploads');
+            await unlink( path.join(dir, product.img_product) );
             await Product.destroy({
               where: {
                 id: req.params.id,

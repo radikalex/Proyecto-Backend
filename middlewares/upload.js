@@ -1,7 +1,7 @@
 const multer  = require('multer');
 const fs = require("fs");
 const path = require('path');
-const { log } = require('console');
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = path.resolve('./uploads');
@@ -11,8 +11,9 @@ const storage = multer.diskStorage({
     cb(null, "./uploads");
   },
   filename: function (req, file, cb) {
-    console.log(file);
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const filename = `${Date.now()}-${file.originalname}`
+    cb(null, filename);
+    req.body.img_product = filename;
   },
 });
 const upload = multer({ storage: storage  })
