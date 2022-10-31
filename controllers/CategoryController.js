@@ -1,4 +1,4 @@
-const { Category, Sequelize } = require("../models/index");
+const { Category, Product, Sequelize } = require("../models/index");
 const { Op } = Sequelize;
 const CategoryController = {
     async getCategories(req, res) {
@@ -81,6 +81,17 @@ const CategoryController = {
             res
                 .status(500)
                 .send({ msg: "There was an error getting a category by name", errpr });
+        }
+    },
+    async getCategoriesProducts(req, res) {
+        try {
+            const categories = await Category.findAll({ include: [Product]});
+            res.status(200).send(categories);
+        } catch (error) {
+            console.error(error);
+            res
+                .status(500)
+                .send({ msg: "There was an error getting the categories with their products", error });
         }
     }
 };

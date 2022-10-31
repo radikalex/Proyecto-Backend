@@ -75,7 +75,7 @@ const ProductController = {
                 .send({ msg: "There was an error getting a product by id", error });
         }
     },
-    async getProductByName(req, res) {
+    async getProductsByName(req, res) {
         try {
             const product = await Product.findAll({
                 where: {
@@ -90,6 +90,34 @@ const ProductController = {
             res
                 .status(500)
                 .send({ msg: "There was an error getting a product by name", error });
+        }
+    },
+    async getProductsByPrice(req, res) {
+        try {
+            const product = await Product.findAll({
+                where: {
+                    price: req.params.price
+                }
+            });
+            res.send(product);
+        } catch (error) {
+            console.error(error);
+            res
+                .status(500)
+                .send({ msg: "There was an error getting a product by price", error });
+        }
+    },
+    async getProductsPriceDesc(req, res) {
+        try {
+            const product = await Product.findAll({
+                order: [["price", "DESC"]]
+            });
+            res.send(product);
+        } catch (error) {
+            console.error(error);
+            res
+                .status(500)
+                .send({ msg: "There was an error getting a product by price", error });
         }
     }
 };
