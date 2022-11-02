@@ -1,10 +1,22 @@
-const { Order, Sequelize } = require("../models/index");
+const { Order, Sequelize, Order_detail } = require("../models/index");
 const { Op } = Sequelize;
 
 const OrderController = {
   async createOrder(req, res) {
     try {
-      const order = await Order.create({ user_id: req.body.user_id });
+      const order = await Order.create({
+        date: req.body.date,
+        user_id: req.body.user_id,
+      });
+
+      for (const product of req.body.products) {
+        Order_detail.create({
+          order_id: order.id,
+          product_id: product.id,
+          amount: product.amount,
+        });
+      }
+
       res.status(201).send({ msg: "Order created succesfully", order });
     } catch (error) {
       console.error(error);
@@ -25,7 +37,6 @@ const OrderController = {
         .send({ msg: "There was an error getting the orders", error });
     }
   },
-
 };
 
 module.exports = OrderController;
