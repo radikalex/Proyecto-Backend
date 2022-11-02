@@ -29,22 +29,22 @@ const UserController = {
       if (!user) {
         return res
           .status(400)
-          .send({ message: "Usuario o contraseña incorrectos" });
+          .send({ message: "Username or password incorrect" });
       }
       const isMatch = bcrypt.compareSync(req.body.password, user.password);
       if (!isMatch) {
         return res
           .status(400)
-          .send({ message: "Usuario o contraseña incorrectos" });
+          .send({ message: "Username or password incorrect" });
       }
       let token = jwt.sign({ id: user.id }, jwt_secret);
       Token.create({ token, UserId: user.id });
-      res.send({ message: "Bienvenid@" + user.name, user, token });
+      res.send({ message: "Welcome" + user.name, user, token });
     } catch (error) {
       console.error(error);
       res
         .status(500)
-        .send({ msg: "There was an error getting the users", error });
+        .send({ msg: "There was an error during login", error });
     }
   },
 
@@ -58,12 +58,12 @@ const UserController = {
           ],
         },
       });
-      res.send({ message: "Desconectado con éxito" });
+      res.send({ message: "Disconnected successfully" });
     } catch (error) {
       console.log(error);
       res
         .status(500)
-        .send({ message: "hubo un problema al tratar de desconectarte" });
+        .send({ message: "There was an error during logout" });
     }
   },
 
