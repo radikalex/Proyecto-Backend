@@ -1,10 +1,15 @@
-const { User, Sequelize } = require("../models/index");
+const { User, Sequelize, Token } = require("../models/index");
 const { Op } = Sequelize;
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { jwt_secret } = require("../config/config.json")["development"];
 
 const UserController = {
   async createUser(req, res) {
     try {
-      const user = await User.create(req.body);
+      req.body.role = "user";
+      const password = bcrypt.hashSync(req.body.password, 10);
+      const user = await User.create({ ...req.body, password: password });
       res.status(201).send({ msg: "User created succesfully", user });
     } catch (error) {
       console.error(error);
@@ -14,17 +19,65 @@ const UserController = {
     }
   },
 
+  async login(req, res) {
+    try {
+      const user = await User.findOne({
+        where: {
+          email: req.body.email,
+        },
+      });
+      if (!user) {
+        return res
+          .status(400)
+          .send({ message: "Usuario o contraseña incorrectos" });
+      }
+      const isMatch = bcrypt.compareSync(req.body.password, user.password);
+      if (!isMatch) {
+        return res
+          .status(400)
+          .send({ message: "Usuario o contraseña incorrectos" });
+      }
+      let token = jwt.sign({ id: user.id }, jwt_secret);
+      Token.create({ token, UserId: user.id });
+      res.send({ message: "Bienvenid@" + user.name, user, token });
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error getting the users", error });
+    }
+  },
+
+  async logout(req, res) {
+    try {
+      await Token.destroy({
+        where: {
+          [Op.and]: [
+            { UserId: req.user.id },
+            { token: req.headers.authorization },
+          ],
+        },
+      });
+      res.send({ message: "Desconectado con éxito" });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .send({ message: "hubo un problema al tratar de desconectarte" });
+    }
+  },
+
   async getUsers(req, res) {
     try {
-        const users = await User.findAll();
-        res.status(200).send(users);
+      const users = await User.findAll();
+      res.status(200).send(users);
     } catch (error) {
-        console.error(error);
-        res
-            .status(500)
-            .send({ msg: "There was an error getting the users", error });
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error getting the users", error });
     }
-},
+  },
 
   async updateUserById(req, res) {
     try {
@@ -47,19 +100,19 @@ const UserController = {
 
   async deleteUserById(req, res) {
     try {
-        await User.destroy({
-          where: {
-            id: req.params.id,
-          },
-        });
-        res.send({ msg: "User deleted" });
-      } catch (error) {
-        console.error(error);
-        res
-          .status(500)
-          .send({ msg: "There was an error deleting the user", error });
-      }
-},
+      await User.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+      res.send({ msg: "User deleted" });
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error deleting the user", error });
+    }
+  },
 };
 
 module.exports = UserController;
