@@ -42,14 +42,14 @@ const ProductController = {
                     id: req.params.id,
                   },
                 });
-                if(product.img_product !== req.body.img_product) {
-                    const dir = path.resolve('./uploads');
+                if( product.img_product !== req.body.img_product && ! /default\/.*/gm.test(product.img_product) ) {
+                    const dir = path.resolve('./product_images');
                     await unlink( path.join(dir, product.img_product) );
                 }
                 res.send({ msg: "Product updated" });
             }
             else {
-                const dir = path.resolve('./uploads');
+                const dir = path.resolve('./product_images');
                 await unlink( path.join(dir, req.body.img_product) );
                 res.status(404).send({msg: `Error: No product with id ${req.params.id} found`});
             }
@@ -66,8 +66,10 @@ const ProductController = {
             if(!product) {
                 return res.status(404).send({msg: `Error: No product with id ${req.params.id} found`});
             }
-            const dir = path.resolve('./uploads');
-            await unlink( path.join(dir, product.img_product) );
+            if( ! /default\/.*/gm.test(product.img_product) ) {
+                const dir = path.resolve('./product_images');
+                await unlink( path.join(dir, product.img_product) );
+            }
             await Product.destroy({
               where: {
                 id: req.params.id,

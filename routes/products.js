@@ -4,10 +4,11 @@ const upload = require("../middlewares/upload");
 const router = express.Router()
 const validateBodyParams = require("../middlewares/validateBodyParams");
 const { check } = require('express-validator');
+const { authentication, isAdmin } = require("../middlewares/authentication");
 
 router.get("/getProducts", ProductController.getProducts);
 
-router.post("/createProduct",  upload.single('img_product'),  [
+router.post("/createProduct",  authentication, isAdmin, upload.single('img_product'),  [
     check('name', 'The name cant be empty.').notEmpty(),
     check('price', 'The price cant be empty.').notEmpty(),
     check('description', 'The description cant be empty.').notEmpty(),
@@ -16,9 +17,9 @@ router.post("/createProduct",  upload.single('img_product'),  [
     validateBodyParams
 ], ProductController.createProduct);
 
-router.put("/updateProductById/id/:id", upload.single('img_product'), ProductController.updateProductById);
+router.put("/updateProductById/id/:id", authentication, isAdmin, upload.single('img_product'), ProductController.updateProductById);
 
-router.delete("/deleteProductById/id/:id", ProductController.deleteProductById);
+router.delete("/deleteProductById/id/:id", authentication, isAdmin, ProductController.deleteProductById);
 
 router.get("/getProductById/id/:id", ProductController.getProductById);
 router.get("/getProductsByName/name/:name", ProductController.getProductsByName);
