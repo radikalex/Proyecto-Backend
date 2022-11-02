@@ -1,4 +1,4 @@
-const { Order, Sequelize, Order_detail } = require("../models/index");
+const { Order, Sequelize, Order_detail, Product } = require("../models/index");
 const { Op } = Sequelize;
 
 const OrderController = {
@@ -28,7 +28,7 @@ const OrderController = {
 
   async getOrders(req, res) {
     try {
-      const orders = await Order.findAll();
+      const orders = await Order.findAll({include: [Product]});
       res.status(200).send(orders);
     } catch (error) {
       console.error(error);
