@@ -95,7 +95,7 @@ const UserController = {
       console.error(error);
       res
         .status(500)
-        .send({ msg: "There was an error getting the users", error });
+        .send({ msg: "There was an error getting user", error });
     }
   },
 

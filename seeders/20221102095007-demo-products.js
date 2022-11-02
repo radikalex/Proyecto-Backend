@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('Users', [
+    return queryInterface.bulkInsert('Products', [
       {
         name: 'NZXT Function Mini TKL Mechanical Keyboard',
         price: 99.99,
