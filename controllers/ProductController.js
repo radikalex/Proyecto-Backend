@@ -2,7 +2,6 @@ const { Product, Category, Sequelize } = require("../models/index");
 const { Op } = Sequelize;
 const { unlink } = require("fs/promises");
 const path = require('path');
-const { log } = require("console");
 
 const ProductController = {
     async getProducts(req, res) {
@@ -18,7 +17,6 @@ const ProductController = {
     },
     async createProduct(req, res) {
         try {
-            console.log(req.body);
             const product = await Product.create(req.body);
             res.status(201).send({msg: "Product added", product})
         } catch (error) {
@@ -30,21 +28,31 @@ const ProductController = {
     },
     async updateProductById(req, res) {
         try {
-            req.body.img_product = req.file.filename;
-            await Product.update({ 
-                name: req.body.name, 
-                price: req.body.price, 
-                description: req.body.description,
-                img_product: req.body.img_product,
-                category_id: req.body.category_id
-            },
-            {
-              where: {
-                id: req.params.id,
-              },
+            const product = await Product.findByPk(req.params.id);
+            if(product) {
+                await Product.update({ 
+                    name: req.body.name, 
+                    price: req.body.price, 
+                    description: req.body.description,
+                    img_product: req.body.img_product,
+                    category_id: req.body.category_id
+                },
+                {
+                  where: {
+                    id: req.params.id,
+                  },
+                });
+                if(product.img_product !== req.body.img_product) {
+                    const dir = path.resolve('./uploads');
+                    await unlink( path.join(dir, product.img_product) );
+                }
+                res.send({ msg: "Product updated" });
             }
-          );
-          res.send({ msg: "Product updated" });
+            else {
+                const dir = path.resolve('./uploads');
+                await unlink( path.join(dir, req.body.img_product) );
+                res.status(404).send({msg: `Error: No product with id ${req.params.id} found`});
+            }
         } catch (error) {
           console.error(error);
           res
@@ -52,9 +60,12 @@ const ProductController = {
             .send({ msg: "There was an error updating the product", error });
         }
     },
-    async deleteProduct(req, res) {
+    async deleteProductById(req, res) {
         try {
             const product = await Product.findByPk(req.params.id);
+            if(!product) {
+                return res.status(404).send({msg: `Error: No product with id ${req.params.id} found`});
+            }
             const dir = path.resolve('./uploads');
             await unlink( path.join(dir, product.img_product) );
             await Product.destroy({
@@ -73,7 +84,10 @@ const ProductController = {
     async getProductById(req, res) {
         try {
             const product = await Product.findByPk(req.params.id);
-            res.send(product);
+            if(!product)
+                res.status(404).send({msg: `Error: No product with id ${req.params.id} found`});
+            else
+                res.send(product);
         } catch (error) {
             console.error(error);
             res
@@ -83,14 +97,17 @@ const ProductController = {
     },
     async getProductsByName(req, res) {
         try {
-            const product = await Product.findAll({
+            const products = await Product.findAll({
                 where: {
                     name: {
                         [Op.like]: `%${req.params.name}%`,
                     },
                 }
             });
-            res.send(product);
+            if(products.length > 0)
+                res.send(products);
+            else 
+                res.status(404).send({msg: `Error: No products with '${req.params.name}' in their name`});
         } catch (error) {
             console.error(error);
             res
@@ -100,12 +117,15 @@ const ProductController = {
     },
     async getProductsByPrice(req, res) {
         try {
-            const product = await Product.findAll({
+            const products = await Product.findAll({
                 where: {
                     price: req.params.price
                 }
             });
-            res.send(product);
+            if(products.length > 0)
+                res.send(products);
+            else 
+                res.status(404).send({msg: `Error: No product with a price of '${req.params.price}'`});
         } catch (error) {
             console.error(error);
             res

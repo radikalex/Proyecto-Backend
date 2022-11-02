@@ -12,13 +12,13 @@ router.post("/createProduct",  upload.single('img_product'),  [
     check('price', 'The price cant be empty.').notEmpty(),
     check('description', 'The description cant be empty.').notEmpty(),
     check('category_id', 'The category_id cant be empty.').notEmpty(),
-    check('img_product', 'The img_product cant be empty.').notEmpty(),
+    check('img_product', 'Please, select a valid file image.').notEmpty(),
     validateBodyParams
 ], ProductController.createProduct);
 
 router.put("/updateProductById/id/:id", upload.single('img_product'), ProductController.updateProductById);
 
-router.delete("/deleteProductById/id/:id", ProductController.deleteProduct);
+router.delete("/deleteProductById/id/:id", ProductController.deleteProductById);
 
 router.get("/getProductById/id/:id", ProductController.getProductById);
 router.get("/getProductsByName/name/:name", ProductController.getProductsByName);
