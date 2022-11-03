@@ -14,7 +14,6 @@ const ReviewController = {
 
   async getReviews(req, res) {
     try {
-      // const reviews = await Review.findAll({ include: [User] });
       const reviews = await Review.findAll({
         attributes: {
           exclude: ["user_id", "createdAt", "updatedAt"],

@@ -6,7 +6,15 @@ const path = require("path");
 const ProductController = {
   async getProducts(req, res) {
     try {
-      const products = await Product.findAll({ include: [Category, Review] });
+      const products = await Product.findAll({
+        attributes: {
+          exclude: ["category_id", "createdAt", "updatedAt"],
+        },
+        include: [
+          { model: Category, attributes: ["name"] },
+          { model: Review, attributes: ["content", "rating"] },
+        ],
+      });
       res.status(200).send(products);
     } catch (error) {
       console.error(error);
@@ -94,7 +102,14 @@ const ProductController = {
   async getProductById(req, res) {
     try {
       const product = await Product.findByPk(req.params.id, {
-        include: [Category, Review],
+        // include: [Category, Review],
+        attributes: {
+          exclude: ["category_id", "createdAt", "updatedAt"],
+        },
+        include: [
+          { model: Category, attributes: ["name"] },
+          { model: Review, attributes: ["content", "rating"] },
+        ],
       });
       if (!product)
         res
