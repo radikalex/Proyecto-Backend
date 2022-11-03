@@ -102,7 +102,6 @@ const ProductController = {
   async getProductById(req, res) {
     try {
       const product = await Product.findByPk(req.params.id, {
-        // include: [Category, Review],
         attributes: {
           exclude: ["category_id", "createdAt", "updatedAt"],
         },
