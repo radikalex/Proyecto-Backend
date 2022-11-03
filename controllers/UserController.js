@@ -42,9 +42,7 @@ const UserController = {
       res.send({ message: "Welcome " + user.name, user, token });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .send({ msg: "There was an error during login", error });
+      res.status(500).send({ msg: "There was an error during login", error });
     }
   },
 
@@ -61,9 +59,7 @@ const UserController = {
       res.send({ message: "Disconnected successfully" });
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .send({ message: "There was an error during logout" });
+      res.status(500).send({ message: "There was an error during logout" });
     }
   },
 
@@ -79,13 +75,22 @@ const UserController = {
     }
   },
 
-  // Endpoint que nos traiga la información del usuario conectado
-  // junto a los pedidos que tiene y los productos que contiene cada pedido
-
   async getUserWithOrderById(req, res) {
     try {
       const users = await User.findAll({
-        include: [{ model: Order, include: [Product] }],
+        attributes: { exclude: ["password", "role", "createdAt", "updatedAt"] },
+        include: [
+          {
+            model: Order,
+            attributes: ["id", "date"],
+            include: [
+              {
+                model: Product,
+                attributes: { exclude: ["createdAt", "updatedAt"] },
+              },
+            ],
+          },
+        ],
         where: {
           id: req.user.id,
         },
@@ -93,9 +98,7 @@ const UserController = {
       res.status(200).send(users);
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .send({ msg: "There was an error getting user", error });
+      res.status(500).send({ msg: "There was an error getting user", error });
     }
   },
 
