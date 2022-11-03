@@ -1,5 +1,4 @@
 const { Review, User, Sequelize } = require("../models/index");
-const { Op } = Sequelize;
 
 const ReviewController = {
   async createreview(req, res) {
@@ -15,7 +14,13 @@ const ReviewController = {
 
   async getReviews(req, res) {
     try {
-      const reviews = await Review.findAll({ include: [User] });
+      // const reviews = await Review.findAll({ include: [User] });
+      const reviews = await Review.findAll({
+        attributes: {
+          exclude: ["user_id", "createdAt", "updatedAt"],
+        },
+        include: { model: User, attributes: ["name"] },
+      });
       res.status(200).send(reviews);
     } catch (error) {
       console.error(error);
