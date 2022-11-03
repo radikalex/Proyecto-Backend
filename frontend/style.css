@@ -1,0 +1,91 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --header-height: 80px;
+    --footer-height: 50px;
+}
+
+html, body {
+    height: 100%;
+}
+
+header {
+    height: var(--header-height);
+    /* background-color: rebeccapurple; */
+}
+
+nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+}
+
+nav span {
+    font-size: 26px;
+    cursor: pointer;
+}
+
+main {
+    min-height: calc( 100% - (var(--header-height) + var(--footer-height)) );
+    display: flex;
+}
+
+footer {
+    height: var(--footer-height);
+    background-color: cadetblue;
+}
+
+.hide {
+    display: none;
+}
+
+.home {
+    /* background-color: red; */
+    flex: 1;
+}
+
+.products {
+    /* background-color: blue; */
+    flex: 1;
+    display: flex;
+}
+
+.sidebar-filters {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    /* background-color: chartreuse; */
+}
+
+.products-view {
+    flex: 5;
+    /* background-color: darkgreen; */
+}
+
+.products-container {
+    align-self: center;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 300px;
+    border: 2px solid black;
+}
+
+.card-img {
+    display: flex;
+    justify-content: center;
+}
+
+img {
+    width: 50%;
+}
