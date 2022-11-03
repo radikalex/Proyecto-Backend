@@ -16,8 +16,8 @@ const OrderController = {
           amount: product.amount,
         });
       }
-
       res.status(201).send({ msg: "Order created succesfully", order });
+      
     } catch (error) {
       console.error(error);
       res
@@ -28,7 +28,7 @@ const OrderController = {
 
   async getOrders(req, res) {
     try {
-      const orders = await Order.findAll({include: [Product]});
+      const orders = await Order.findAll({ include: [Product] });
       res.status(200).send(orders);
     } catch (error) {
       console.error(error);
