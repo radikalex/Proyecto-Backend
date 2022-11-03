@@ -131,10 +131,12 @@ const ProductController = {
           },
         },
       });
-      if (products.length > 0) res.send(products);
+      if (products.length > 0) 
+        res.send({msg: `${products.length} ${products.length === 1 ? "product" : "products"} found with '${req.params.name}' in their name`,  results: products});
       else
-        res.status(404).send({
-          msg: `Error: No products with '${req.params.name}' in their name`,
+        res.status(200).send({
+          msg: `No products with '${req.params.name}' in their name`,
+          results: []
         });
     } catch (error) {
       console.error(error);
@@ -152,8 +154,8 @@ const ProductController = {
       });
       if (products.length > 0) res.send(products);
       else
-        res.status(404).send({
-          msg: `Error: No product with a price of '${req.params.price}'`,
+        res.status(200).send({
+          msg: `No product with a price of '${req.params.price}'`,
         });
     } catch (error) {
       console.error(error);

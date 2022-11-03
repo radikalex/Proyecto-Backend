@@ -30,6 +30,10 @@ nav span {
     cursor: pointer;
 }
 
+nav span:hover {
+    text-decoration: underline;
+}
+
 main {
     min-height: calc( 100% - (var(--header-height) + var(--footer-height)) );
     display: flex;
@@ -81,6 +85,10 @@ footer {
     /* background-color: darkgreen; */
 }
 
+.search {
+    margin: 30px 0;
+}
+
 .products-container {
     align-self: center;
     display: flex;
@@ -121,7 +129,9 @@ footer {
 }
 
 .product-info {
+    margin-top: 50px;
     display: flex;
+    /* background-color: #ff6000; */
 }
 
 .product-info-img {

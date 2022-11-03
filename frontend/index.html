@@ -20,6 +20,9 @@
         <div id="products" class="hide">
             <div id="sidebar-filters" class="sidebar-filters"></div>
             <div class="products-view">
+                <form onsubmit="searchProductsByName(event)">
+                    <input type="text" class="form-control search" id="search" placeholder="Search a product...">
+                </form>
                 <div id="products-container" class="products-container"></div>
             </div>
         </div>
