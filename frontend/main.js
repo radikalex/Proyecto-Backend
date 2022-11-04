@@ -7,6 +7,10 @@ const inputSearch = document.getElementById("search");
 
 let categories = [];
 let products = [];
+let category_active = 0;
+let min_price = "1";
+let max_price = "9999";
+let priceOrder = "";
 
 function hideAllViews() {
   homeDiv.classList.replace("home", "hide");
@@ -21,8 +25,14 @@ function goHome() {
 
 function goProducts() {
   hideAllViews();
+  categories = [];
+  products = [];
+  category_active = 0;
+  min_price = "1";
+  max_price = "9999";
+  priceOrder = "";
   getCategories();
-  getProducts();
+  getProductsQuery();
   productsDiv.classList.replace("hide", "products");
 }
 
@@ -38,23 +48,38 @@ async function getProductById(id) {
 function searchProductsByName(event) {
   event.preventDefault();
 
-  getProductsByName();
+  getProductsQuery();
 }
 
-async function getProductsByName(name) {
-    const query = inputSearch.value.trim();
+async function getProductsQuery() {
+  const query = inputSearch.value.trim();
 
-    if(query !== "") {
-        try {
-            const res = await axios.get(`http://localhost:3000/products/getProductsByName/name/${query}`);
-            products = res.data.results;
-            printProducts(products);
-        } catch (error) {
-            console.error(error);
-        }
-    } else {
-        getProducts();
-    }
+  try {
+      const res = await axios.get(`http://localhost:3000/products/getProductsQuery?name=${query}&category=${category_active}&minPrice=${min_price}&maxPrice=${max_price}&priceOrder=${priceOrder}`);
+      products = res.data.results;
+      printProducts(products);
+  } catch (error) {
+      console.error(error);
+  }
+    
+}
+
+function switchCategory(id) {
+  category_active = id;
+  const li_categories = document.querySelectorAll('.sidebar-filters li');
+
+  if(id === 0)
+    li_categories[0].className = "category-active";
+  else
+    li_categories[0].className = "";
+  for (let i = 1; i < li_categories.length; i++) {
+    if(categories[i-1].id === id) 
+      li_categories[i].className = "category-active";
+    else
+      li_categories[i].className = "";
+  }
+
+  getProductsQuery();
 }
 
 async function goProductDetail(product_id) {
@@ -88,24 +113,87 @@ function printCategories(categories) {
   sidebarFilters.innerHTML = `<span class="header-sidebar">Categories</span>`;
   const ul = document.createElement("ul");
   ul.className = "categories-list";
-  ul.innerHTML = '<li class="category-active">All categories</li>'
+  ul.innerHTML = `<li onclick="switchCategory(0)" class="category-active">All categories</li>`
 
   for (const category of categories) {
-    const li = document.createElement("li");
-    li.innerHTML = category.name;
-    ul.appendChild(li);
+    ul.innerHTML += `<li onclick="switchCategory(${category.id})">${category.name}</li>`;
   }
   sidebarFilters.appendChild(ul);
+  printPriceFilter();
 }
 
-async function getProducts() {
-  try {
-    const res = await axios.get(`http://localhost:3000/products/getProducts`);
-    products = res.data;
-    printProducts(products);
-  } catch (error) {
-    console.error(error);
+function printPriceFilter() {
+  sidebarFilters.innerHTML += `
+    <span class="header-sidebar">Price</span>
+    <div class="inputs-price">
+      <div class="price-limit">
+        <label  class="price-label"> Min: </label> 
+        <input  class="form-control price-input" 
+                onfocus="eraseCurrency(this)"
+                onblur="addCurrency(this)"
+                onkeypress="validateInput(event)"
+                onchange="validateMinPrice(event, this)"
+                value="1$"> 
+      </div>
+      <div class="price-limit">
+        <label  class="price-label"> Max: </label> 
+        <input  class="form-control price-input" 
+                onfocus="eraseCurrency(this)"
+                onblur="addCurrency(this)"
+                onkeypress="validateInput(event)"
+                onchange="validateMaxPrice(event, this)"
+                value="9999$">
+      </div>
+      <div class="price-order">
+        <label class="label-order">Order:</label>
+        <select class="form-select order-select" onchange="changeOrder(this)">
+          <option value="">None</option>
+          <option value="ASC">Lower to higher</option>
+          <option value="DESC">Higuer to lower</option>
+        </select>
+      </div>
+    </div>
+  `;
+}
+
+function changeOrder(select) {
+  priceOrder = select.value;
+  getProductsQuery();
+}
+
+function validateMinPrice(e, input) {
+  e.preventDefault();
+  if(input.value === "" || parseInt(input.value) < 0)
+    input.value = "1";
+  if(parseInt(input.value) > parseInt(max_price))
+    input.value = max_price
+  min_price = input.value;
+  getProductsQuery();
+}
+
+function validateMaxPrice(e, input) {
+  e.preventDefault();
+  if(input.value === "" || parseInt(input.value) > 9999)
+    input.value = "9999";
+  if(parseInt(input.value) < parseInt(min_price))
+    input.value = min_price
+  max_price = input.value;
+  getProductsQuery();
+}
+
+
+function validateInput(event) {
+  if (!/[0-9]/.test(event.key)) {
+    event.preventDefault();
   }
+}
+
+function eraseCurrency(input) {
+  input.value = input.value.slice(0, -1);
+}
+
+function addCurrency(input) {
+  input.value = input.value + '$'
 }
 
 function printProducts(products) {
@@ -137,4 +225,4 @@ function debounce(callback, wait) {
   };
 }
 
-inputSearch.addEventListener('keyup', getProductsByName)
+inputSearch.addEventListener('keyup', getProductsQuery)

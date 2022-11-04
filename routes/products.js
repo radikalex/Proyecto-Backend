@@ -5,6 +5,7 @@ const router = express.Router()
 const validateBodyParams = require("../middlewares/validateBodyParams");
 const { check } = require('express-validator');
 const { authentication, isAdmin } = require("../middlewares/authentication");
+const { checkProductsQuery } = require("../middlewares/checkProductsQuery");
 
 router.get("/getProducts", ProductController.getProducts);
 
@@ -25,6 +26,6 @@ router.get("/getProductById/id/:id", ProductController.getProductById);
 router.get("/getProductsByName/name/:name", ProductController.getProductsByName);
 router.get("/getProductsByPrice/price/:price", ProductController.getProductsByPrice);
 router.get("/getProductsPriceDesc", ProductController.getProductsPriceDesc);
-router.get("/getProductsQuery", ProductController.getProductsQuery);
+router.get("/getProductsQuery", checkProductsQuery, ProductController.getProductsQuery);
 
 module.exports = router

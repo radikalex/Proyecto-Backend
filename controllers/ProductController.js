@@ -178,20 +178,20 @@ const ProductController = {
     }
   },
   async getProductsQuery(req, res) {
-    if(req.query.category === 0) {
-      
-    }
-
     try {
       const products = await Product.findAll({
         where: {
           category_id: req.query.category,
           name: {
             [Op.like]: `%${req.query.name}%`,
+          },
+          price: {
+            [Op.between]: [req.query.minPrice, req.query.maxPrice]
           }
-        }
+        },
+        order: req.query.priceOrder
       });
-      res.send(products);
+      res.send({msg: "Products found", results: products});
     } catch (error) {
       console.error(error);
       res
