@@ -80,6 +80,10 @@ footer {
     /* background-color: chartreuse; */
 }
 
+.sidebar-filters li {
+    padding: 10px;
+}
+
 .products-view {
     flex: 5;
     /* background-color: darkgreen; */
@@ -106,6 +110,7 @@ footer {
     margin: 0.5%;
     padding: 0 10px;
     padding-bottom: 20px;
+    cursor: pointer;
 }
 
 .product-name {
@@ -168,4 +173,8 @@ footer {
 
 .detail-description {
     display: block;
+}
+
+.category-active {
+    background-color: rgb(196, 183, 183);
 }

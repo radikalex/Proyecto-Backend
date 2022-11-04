@@ -25,5 +25,6 @@ router.get("/getProductById/id/:id", ProductController.getProductById);
 router.get("/getProductsByName/name/:name", ProductController.getProductsByName);
 router.get("/getProductsByPrice/price/:price", ProductController.getProductsByPrice);
 router.get("/getProductsPriceDesc", ProductController.getProductsPriceDesc);
+router.get("/getProductsQuery", ProductController.getProductsQuery);
 
 module.exports = router

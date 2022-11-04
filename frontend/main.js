@@ -88,6 +88,7 @@ function printCategories(categories) {
   sidebarFilters.innerHTML = `<span class="header-sidebar">Categories</span>`;
   const ul = document.createElement("ul");
   ul.className = "categories-list";
+  ul.innerHTML = '<li class="category-active">All categories</li>'
 
   for (const category of categories) {
     const li = document.createElement("li");
@@ -136,4 +137,4 @@ function debounce(callback, wait) {
   };
 }
 
-inputSearch.addEventListener('keyup', getProductsByName )
+inputSearch.addEventListener('keyup', getProductsByName)

@@ -177,6 +177,30 @@ const ProductController = {
         .send({ msg: "There was an error getting a product by price", error });
     }
   },
+  async getProductsQuery(req, res) {
+    if(req.query.category === 0) {
+      
+    }
+
+    try {
+      const products = await Product.findAll({
+        where: {
+          category_id: req.query.category,
+          name: {
+            [Op.like]: `%${req.query.name}%`,
+          }
+        }
+      });
+      res.send(products);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error getting the products", error });
+    }
+  },
 };
+
+
 
 module.exports = ProductController;
