@@ -1,4 +1,4 @@
-const { Product, Category, Review, Sequelize } = require("../models/index");
+const { Product, Category, Review, User, Sequelize } = require("../models/index");
 const { Op } = Sequelize;
 const { unlink } = require("fs/promises");
 const path = require("path");
@@ -107,7 +107,7 @@ const ProductController = {
         },
         include: [
           { model: Category, attributes: ["name"] },
-          { model: Review, attributes: ["content", "rating"] },
+          { model: Review, attributes: ["content", "rating"], include: [{ model: User, attributes: ["name"]}]},
         ],
       });
       if (!product)
@@ -180,6 +180,7 @@ const ProductController = {
   async getProductsQuery(req, res) {
     try {
       const products = await Product.findAll({
+        include: [Review],
         where: {
           category_id: req.query.category,
           name: {

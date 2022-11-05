@@ -1,9 +1,9 @@
 const homeDiv = document.getElementById("home");
 const productsDiv = document.getElementById("products");
-const productDetailDiv = document.getElementById("product-detail");
 const sidebarFilters = document.getElementById("sidebar-filters");
 const productsContainer = document.getElementById("products-container");
 const inputSearch = document.getElementById("search");
+const productModal = document.getElementById("productModal")
 
 let categories = [];
 let products = [];
@@ -15,7 +15,6 @@ let priceOrder = "";
 function hideAllViews() {
   homeDiv.classList.replace("home", "hide");
   productsDiv.classList.replace("products", "hide");
-  productDetailDiv.classList.replace("product-detail", "hide");
 }
 
 function goHome() {
@@ -83,20 +82,78 @@ function switchCategory(id) {
 }
 
 async function goProductDetail(product_id) {
+  
   const product = await getProductById(product_id);
-  hideAllViews();
-  productDetailDiv.classList.replace("hide", "product-detail");
-  productDetailDiv.innerHTML = `
+  document.getElementById('productModalTitle').innerHTML = `${product.name}`
+  let myModal = new bootstrap.Modal(productModal, {});
+  myModal.show();
+
+  let product_innerHTML = `
         <div class="product-info">
             <div class="product-info-img"><img src="../product_images/${product.img_product}"></div>
             <div class="product-info-description">
-                <span class="detail-name">${product.name}</span>
+                <span class="detail-name">${product.name}</span>`;
+  if(product.Reviews.length > 0) {
+    const info_rating = getInfoRating(product);
+    product_innerHTML += `
+    <div>`;
+    for (let i = 0; i < info_rating[0]; i++) {
+      product_innerHTML += `<span class="fa fa-star checked"></span>`;
+    }
+    for (let i = 0; i < 5 - info_rating[0]; i++) {
+      product_innerHTML += `<span class="fa fa-star"></span>`;
+    }
+    product_innerHTML += `
+      <span>(${info_rating[1]})</span>
+    </div>`;
+  }
+  
+  product_innerHTML += ` 
                 <span class="detail-price">${product.price}$</span>
                 <span class="detail-description">${product.description}</span>
-                <button class="btn btn-primary">Add to the cart</button>
+                <button class="btn btn-primary addCart">Add to the cart</button>
             </div>
         </div>
+        <hr class="mt-5">
+        <div class="reviews-title">Reviews</div>
+        <hr>
+  `;
+
+  if(product.Reviews.length > 0) {
+    product_innerHTML += `
+    <div class="reviews-container">`;
+    for (const review of product.Reviews) {
+      product_innerHTML += 
+      `
+        <div class="review">
+          <div class="review-header">
+            <span class="review-author">${review.User.name}</span>
+            <div class="review-header-separator">-</div>
+            <div class="review-stars">
+      `;
+      for (let i = 0; i < Math.round(review.rating); i++) {
+        product_innerHTML += `<span class="fa fa-star checked"></span>`;
+      }
+      for (let i = 0; i < 5 - Math.round(review.rating); i++) {
+        product_innerHTML += `<span class="fa fa-star"></span>`;
+      }
+      product_innerHTML += 
+      `     </div>
+          </div> 
+          <div class="review-content">${review.content}</div>
+        </div>   
+      `
+    }
+    product_innerHTML += `
+    </div>
     `;
+  } else {
+    product_innerHTML += `
+      <div class="reviews-none">There are no reviews for this product yet.</div>
+    `;
+  }
+
+  document.getElementById('productModalBody').innerHTML = product_innerHTML;
 }
 
 async function getCategories() {
@@ -203,16 +260,39 @@ function printProducts(products) {
         productsContainer.innerHTML = "No product...";
     } else {
         for (const product of products) {
-            productsContainer.innerHTML += `
-                <div class="card" onclick="goProductDetail( ${product.id})">
-                    <div class="product-img"><img class="card-img" src="../product_images/${product.img_product}"></div>
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-price">${product.price}$</div>
-                </div>
-                `;
+          let card_innerHtml = `
+          <div class="card" onclick="goProductDetail( ${product.id})">
+            <div class="product-img"><img class="card-img" src="../product_images/${product.img_product}"></div>
+            <div class="product-name">${product.name}</div>`;
+          if(product.Reviews.length > 0) {
+            const info_rating = getInfoRating(product);
+            card_innerHtml += `
+            <div>`;
+            for (let i = 0; i < info_rating[0]; i++) {
+              card_innerHtml += `<span class="fa fa-star checked"></span>`;
+            }
+            for (let i = 0; i < 5 - info_rating[0]; i++) {
+              card_innerHtml += `<span class="fa fa-star"></span>`;
+            }
+            card_innerHtml += `
+              <span>(${info_rating[1]})</span>
+            </div>`;
+          }
+          card_innerHtml += `
+            <div class="product-price">${product.price}$</div>
+          </div>`;
+          productsContainer.innerHTML += card_innerHtml;
         }
   }
 
+}
+
+function getInfoRating(product) {
+  const number_reviews = product.Reviews.length;
+  const sum_rating = product.Reviews.map((review) => review.rating).reduce((a, b) => a + b);
+  const average_rating = sum_rating/number_reviews;
+
+  return [Math.round(average_rating), number_reviews]
 }
 
 function debounce(callback, wait) {
