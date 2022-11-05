@@ -10,7 +10,7 @@ const UserController = {
       req.body.role = "user";
       const password = bcrypt.hashSync(req.body.password, 10);
       const user = await User.create({ ...req.body, password: password });
-      res.status(201).send({ msg: "User created succesfully", user });
+      res.status(201).send({ ok:true, msg: "User created succesfully", user });
     } catch (error) {
       console.error(error);
       res
@@ -28,18 +28,18 @@ const UserController = {
       });
       if (!user) {
         return res
-          .status(400)
-          .send({ message: "Username or password incorrect" });
+          .status(200)
+          .send({ ok: false, message: "Username or password incorrect" });
       }
       const isMatch = bcrypt.compareSync(req.body.password, user.password);
       if (!isMatch) {
         return res
-          .status(400)
-          .send({ message: "Username or password incorrect" });
+          .status(200)
+          .send({ ok: false, message: "Username or password incorrect" });
       }
       let token = jwt.sign({ id: user.id }, jwt_secret);
       Token.create({ token, UserId: user.id });
-      res.send({ message: "Welcome " + user.name, user, token });
+      res.send({ ok: true, message: "Welcome " + user.name, user, token });
     } catch (error) {
       console.error(error);
       res.status(500).send({ msg: "There was an error during login", error });

@@ -3,7 +3,7 @@ const productsDiv = document.getElementById("products");
 const sidebarFilters = document.getElementById("sidebar-filters");
 const productsContainer = document.getElementById("products-container");
 const inputSearch = document.getElementById("search");
-const productModal = document.getElementById("productModal")
+const productModal = document.getElementById("productModal");
 
 let categories = [];
 let products = [];
@@ -12,9 +12,53 @@ let min_price = "1";
 let max_price = "9999";
 let priceOrder = "";
 
+let modalSignUp, modalLogIn;
+
 function hideAllViews() {
   homeDiv.classList.replace("home", "hide");
   productsDiv.classList.replace("products", "hide");
+}
+
+function loadUserInfo() {
+  const user_session = JSON.parse(localStorage.getItem('user_session'));
+  const div = document.getElementById('user-nav');
+
+  if(!user_session || user_session === "") {
+    div.innerHTML = 
+    `
+      <button class="btn btn-primary" onclick="showSignUpModal(event)">Sign Up</button>
+      <button class="btn btn-secondary" onclick="showLogInModal(event)">Log In</button>
+    `;
+  }
+  else { 
+    div.innerHTML = 
+    `
+      <div>
+        <div class="user-info" onclick="displayUserOptions(this)">
+          <img src="./assets/user-icon.png" class="user-info-icon">
+          <span class="user-info-name">${user_session.user.name}</span>
+          <img src="./assets/arrow-down.png" class="arrow-options" id="arrow-options">
+        </div>
+        <div class="user-options">
+          <span>My orders</span>
+          <span onclick="logOut()">Log Out</span>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function displayUserOptions(div) {
+  const content = div.nextElementSibling;
+  const img = document.getElementById('arrow-options');
+
+  if (content.style.maxHeight) {
+    img.src = "./assets/arrow-down.png";
+    content.style.maxHeight = null;
+  } else {
+    img.src = "./assets/arrow-up.png";
+    content.style.maxHeight = content.scrollHeight + "px";
+  }
 }
 
 function goHome() {
@@ -80,6 +124,139 @@ function switchCategory(id) {
 
   getProductsQuery();
 }
+
+function showLogInModal(e) {
+  e.preventDefault();
+  modalLogIn = new bootstrap.Modal(document.getElementById("logInModal"), {});
+  modalLogIn.show();
+}
+
+async function logIn(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const alerts_div = document.getElementById('logIn-alerts');
+
+  try {
+    const res = await axios.post(`http://localhost:3000/users/login`, {email, password});
+    console.log(res);
+    if(!res.data.ok) {
+      createValidationAlert(alerts_div, res.data.message, 3000);
+      return;
+    }
+    const user = res.data.user;
+    const btn_logIn = document.getElementById("btn-logIn");
+    btn_logIn.disabled = true;
+    while (alerts_div.firstChild) {
+      alerts_div.removeChild(alerts_div.firstChild);
+    }
+    const pop_alert = document.createElement('div');
+    pop_alert.className = "alert alert-success";
+    pop_alert.role = "alert";
+    pop_alert.innerHTML = `Welcome ${user.name}!`;
+    alerts_div.appendChild(pop_alert);
+    localStorage.setItem('user_session', JSON.stringify( {user: {id: user.id, name: user.name}, token: res.data.token} ));
+    
+    setTimeout(() => pop_alert.remove(), 1000);
+
+    setTimeout(() => {
+      loadUserInfo();
+      modalLogIn.hide();
+      btn_logIn.disabled = false;
+    }, 1000);
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+async function logOut() {
+  const user_session = JSON.parse(localStorage.getItem('user_session'));
+  const headers = {
+    'Authorization': user_session.token
+  };
+
+  try {
+    const res = await axios.delete(`http://localhost:3000/users/logout`, { headers })
+    console.log(res);
+    localStorage.removeItem('user_session');
+    loadUserInfo();
+  } catch(error) {
+    console.error(error);
+  }
+}
+
+function showSignUpModal(e) {
+  e.preventDefault();
+  modalSignUp = new bootstrap.Modal(document.getElementById("signUpModal"), {});
+  modalSignUp.show();
+}
+
+async function signUp(e) {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const password2 = document.getElementById('signup-password2').value;
+  const alerts_div = document.getElementById('signUp-alerts');
+
+  if(name === "" || email === "" || password === "" || password2 === "") {
+    createValidationAlert(alerts_div, "It is necessary to fill in all the fields", 3000);
+    return;
+  }
+  if( ! /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/gm.test(email) ) {
+    createValidationAlert(alerts_div, "The email format is not valid", 3000);
+    return;
+  }
+  if(password !== password2) {
+    createValidationAlert(alerts_div, "Passwords don't match", 3000);
+    return;
+  }
+  try {
+    const res = await axios.post(`http://localhost:3000/users/createUser`, {name, email, password})
+    if(!res.data.ok) {
+      createValidationAlert(alerts_div, res.data.msg, 3000);
+      return;
+    }
+    const user = res.data.user;
+    const btn_signUp = document.getElementById("btn-signUp");
+    btn_signUp.disabled = true;
+    while (alerts_div.firstChild) {
+      alerts_div.removeChild(alerts_div.firstChild);
+    }
+    const pop_alert = document.createElement('div');
+    pop_alert.className = "alert alert-success";
+    pop_alert.role = "alert";
+    pop_alert.innerHTML = `Welcome to our page ${user.name}! You can now log in.`;
+    alerts_div.appendChild(pop_alert);
+    
+    setTimeout(() => pop_alert.remove(), 1000);
+
+    setTimeout(() => {
+      modalSignUp.hide();
+      btn_signUp.disabled = false;
+    }, 1000);
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+function createValidationAlert(alerts_div, message, time) {
+
+  while (alerts_div.firstChild) {
+      alerts_div.removeChild(alerts_div.firstChild);
+  }
+
+  const pop_alert = document.createElement('div');
+  pop_alert.className = "alert alert-danger";
+  pop_alert.role = "alert";
+  pop_alert.innerHTML = message;
+  alerts_div.appendChild(pop_alert);
+  
+  setTimeout(() => pop_alert.remove(), time);
+}
+
 
 async function goProductDetail(product_id) {
   

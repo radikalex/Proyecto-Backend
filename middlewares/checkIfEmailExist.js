@@ -8,7 +8,7 @@ const checkIfEmailExist = async (req, res, next) => {
       },
     });
     if (user) {
-      res.status(400).send({ msg: "This email already exists" });
+      res.status(200).send({ ok:false, msg: "This email already exists" });
     } else {
       next();
     }
