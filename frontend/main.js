@@ -83,7 +83,7 @@ function loadBodyCartModal() {
     }
     cart_innerHtml += 
     `     
-          <div class="total-price"><span class="total-price-label">Total price:</span> <span class="total-price-value">${getCartTotalPrice()}$</span></div> 
+          <div class="total-price"><span class="total-price-label">Total price:</span> <span class="total-price-value">${getCartTotalPrice().toFixed(2)}$</span></div> 
           <div class="cart-buy"><button onclick="buy()" class="btn btn-primary buy">Buy</div> 
     `
   }
@@ -352,7 +352,7 @@ async function showOrdersUser() {
         <div class="order">
           <div class="order-header">
             <span><b>Date:</b> ${order.date.substring(0, 10)}</span> 
-            <span><b>Total cost of the order:</b> ${total_price}$</span>
+            <span><b>Total cost of the order:</b> ${total_price.toFixed(2)}$</span>
             <span>${order.Products.length} ${order.Products.length > 1 ? "articles" : "article"}</span>
           </div>
         `;
