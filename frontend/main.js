@@ -38,7 +38,7 @@ function loadUserInfo() {
     `
       <div class="user-navArea">
         <div class="user-data">
-          <div class="user-info" onclick="displayUserOptions(this)">
+          <div class="user-info" id="user-info" onclick="displayUserOptions(this)">
             <img src="./assets/user-icon.png" class="user-info-icon">
             <span class="user-info-name">${user_session.user.name}</span>
             <img src="./assets/arrow-down.png" class="arrow-options" id="arrow-options">
@@ -144,6 +144,7 @@ function goProducts() {
   categories = [];
   products = [];
   category_active = 0;
+  inputSearch.value = "";
   min_price = "1";
   max_price = "9999";
   priceOrder = "";
@@ -329,6 +330,7 @@ function createValidationAlert(alerts_div, message, time) {
 }
 
 async function showOrdersUser() {
+  displayUserOptions(document.getElementById('user-info'));
   const bodyOrdersModal = document.getElementById("ordersModalBody");
   const user_session = JSON.parse(localStorage.getItem('user_session'));
   const headers = {
@@ -484,7 +486,7 @@ async function goProductDetail(product_id, showModal) {
   product_innerHTML += ` 
                 <span class="detail-price">${product.price}$</span>
                 <span class="detail-description">${product.description}</span>
-                <button onclick="addProductToCart(${product.id})" class="btn btn-primary addCart">Add to the cart</button>
+                <button onclick="addProductToCart(${product.id})" class="btn btn-primary addCart">Add to the cart <img src="./assets/cart-icon.png" class="cart-img"> </button>
             </div>
         </div>
         <hr class="mt-5">

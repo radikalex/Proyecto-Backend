@@ -26,7 +26,6 @@ const CategoryController = {
     async updateCategoryById(req, res) {
         try {
             const category = await Category.findByPk(req.params.id);
-            console.log(category);
             if(category) {
                 await Category.update({ name: req.body.name },
                 {

@@ -58,7 +58,7 @@ const UserController = {
       });
       res.send({ message: "Disconnected successfully" });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).send({ message: "There was an error during logout" });
     }
   },
