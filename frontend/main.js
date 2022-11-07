@@ -7,12 +7,13 @@ const productModal = document.getElementById("productModal");
 
 let categories = [];
 let products = [];
+let cart = [];
 let category_active = 0;
 let min_price = "1";
 let max_price = "9999";
 let priceOrder = "";
 
-let modalSignUp, modalLogIn;
+let modalSignUp, modalLogIn, modalProductDetail, cartModal;
 
 function hideAllViews() {
   homeDiv.classList.replace("home", "hide");
@@ -20,6 +21,7 @@ function hideAllViews() {
 }
 
 function loadUserInfo() {
+  cart = [];
   const user_session = JSON.parse(localStorage.getItem('user_session'));
   const div = document.getElementById('user-nav');
 
@@ -33,18 +35,88 @@ function loadUserInfo() {
   else { 
     div.innerHTML = 
     `
-      <div>
-        <div class="user-info" onclick="displayUserOptions(this)">
-          <img src="./assets/user-icon.png" class="user-info-icon">
-          <span class="user-info-name">${user_session.user.name}</span>
-          <img src="./assets/arrow-down.png" class="arrow-options" id="arrow-options">
+      <div class="user-navArea">
+        <div class="user-data">
+          <div class="user-info" onclick="displayUserOptions(this)">
+            <img src="./assets/user-icon.png" class="user-info-icon">
+            <span class="user-info-name">${user_session.user.name}</span>
+            <img src="./assets/arrow-down.png" class="arrow-options" id="arrow-options">
+          </div>
+          <div class="user-options">
+            <span onclick="showOrdersUser()">My orders</span>
+            <span onclick="logOut()">Log Out</span>
+          </div>
         </div>
-        <div class="user-options">
-          <span>My orders</span>
-          <span onclick="logOut()">Log Out</span>
+        <div class="cart-area" onclick="showCartModal()">
+          <span class="num-products" id="num-products">${cart.length}</span>
+          <img src="./assets/cart-icon.png" class="cart-img">
         </div>
       </div>
     `;
+  }
+}
+
+function showCartModal() {
+  loadBodyCartModal();
+  cartModal = new bootstrap.Modal(document.getElementById("cartModal"), {});
+  cartModal.show();
+}
+
+function loadBodyCartModal() {
+  const cartBodyModal = document.getElementById("cartModalBody");
+  let cart_innerHtml = ``;
+  if(cart.length === 0)
+    cart_innerHtml = `No products in your cart. Add some!"`;
+  else {
+    for (const item of cart) {
+      cart_innerHtml += 
+      `
+      <div class="cart-product">
+        <div class="cart-product-remove"><button onclick="removeCartProduct(${item.product.id})" class="btn btn-danger"><img class="cart-remove-img" src="./assets/remove-icon.png"<button></div>
+        <div class="cart-product-image"><img class="cart-product-img" src="../product_images/${item.product.img_product}"></div>
+        <div class="cart-product-name">${item.product.name}</div>
+        <div class="cart-product-amount">${item.amount} ${item.amount > 1 ? "units" : "unit"}</div>
+        <div class="cart-product-price">${item.product.price}$</div>
+        </div>
+      `;
+    }
+    cart_innerHtml += 
+    `     
+          <div class="total-price"><span class="total-price-label">Total price:</span> <span class="total-price-value">${getCartTotalPrice()}$</span></div> 
+          <div class="cart-buy"><button onclick="buy()" class="btn btn-primary buy">Buy</div> 
+    `
+  }
+  cartBodyModal.innerHTML = cart_innerHtml;
+}
+
+async function buy() {
+  const user_session = JSON.parse(localStorage.getItem('user_session'));
+  const body = {
+    "date": new Date(),
+    "user_id": user_session.user.id,
+    "products": []
+  }
+  for (const item of cart) {
+    body["products"].push({"id": item.product.id, "amount": item.amount});
+  }
+  try {
+    const res = await axios.post(`http://localhost:3000/orders/createOrder`, body);
+    cart = [];
+    document.getElementById('num-products').innerHTML = `${getCartNumItems()}`;
+    cartModal.hide();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function removeCartProduct(product_id) {
+  for (let i = 0; i < cart.length; i++) {
+    if(cart[i].product.id === product_id) {
+      cart.splice(i, 1);
+      document.getElementById('num-products').innerHTML = `${getCartNumItems()}`;
+      loadBodyCartModal();
+      return;
+    }
   }
 }
 
@@ -139,7 +211,6 @@ async function logIn(e) {
 
   try {
     const res = await axios.post(`http://localhost:3000/users/login`, {email, password});
-    console.log(res);
     if(!res.data.ok) {
       createValidationAlert(alerts_div, res.data.message, 3000);
       return;
@@ -178,7 +249,6 @@ async function logOut() {
 
   try {
     const res = await axios.delete(`http://localhost:3000/users/logout`, { headers })
-    console.log(res);
     localStorage.removeItem('user_session');
     loadUserInfo();
   } catch(error) {
@@ -257,13 +327,59 @@ function createValidationAlert(alerts_div, message, time) {
   setTimeout(() => pop_alert.remove(), time);
 }
 
+async function showOrdersUser() {
+  const bodyOrdersModal = document.getElementById("ordersModalBody");
+  const user_session = JSON.parse(localStorage.getItem('user_session'));
+  const headers = {
+    'Authorization': user_session.token
+  };
+
+  try {
+    const res = await axios.post(`http://localhost:3000/users/getUserWithOrderById`, {}, { headers })
+    const user = res.data;
+    let orders_innerHtml = ``;
+    for (const order of user.Orders) {
+      console.log(user.Orders);
+      const total_price = order.Products.map((product => product.price*product.Order_detail.amount)).reduce((a,b) => a+b)
+      orders_innerHtml += 
+      `
+      <div class="order">
+        <div class="order-header">
+          <span><b>Date:</b> ${order.date.substring(0, 10)}</span> 
+          <span><b>Total cost of the order:</b> ${total_price}$</span>
+          <span>${order.Products.length} ${order.Products.length > 1 ? "articles" : "article"}</span>
+        </div>
+      `;
+      for (const product of order.Products) {
+        orders_innerHtml += 
+        `
+          <div class="order-product">
+            <div class="order-product-image"><img class="order-product-img" src="../product_images/${product.img_product}"></div>
+            <div class="order-product-name">${product.name}</div>
+            <div class="order-product-price">${product.price}$</div>
+            <div class="order-product-amount">${product.Order_detail.amount} ${product.Order_detail.amount > 1 ? "units" : "unit"}</div>
+          </div>
+        `
+      }
+      orders_innerHtml += 
+      `
+      </div>
+      `;
+    }
+    bodyOrdersModal.innerHTML = orders_innerHtml;
+    let myModal = new bootstrap.Modal(document.getElementById("ordersModal"), {});
+    myModal.show();
+  } catch(error) {
+    console.error(error);
+  }
+}
 
 async function goProductDetail(product_id) {
   
   const product = await getProductById(product_id);
   document.getElementById('productModalTitle').innerHTML = `${product.name}`
-  let myModal = new bootstrap.Modal(productModal, {});
-  myModal.show();
+  modalProductDetail = new bootstrap.Modal(productModal, {});
+  modalProductDetail.show();
 
   let product_innerHTML = `
         <div class="product-info">
@@ -288,7 +404,7 @@ async function goProductDetail(product_id) {
   product_innerHTML += ` 
                 <span class="detail-price">${product.price}$</span>
                 <span class="detail-description">${product.description}</span>
-                <button class="btn btn-primary addCart">Add to the cart</button>
+                <button onclick="addProductToCart(${product.id})" class="btn btn-primary addCart">Add to the cart</button>
             </div>
         </div>
         <hr class="mt-5">
@@ -341,6 +457,30 @@ async function getCategories() {
   } catch (error) {
     console.error(error);
   }
+}
+
+function getCartTotalPrice() {
+  return cart.map(item => item.amount*item.product.price).reduce((a, b) => a + b);
+}
+
+function getCartNumItems() {
+  return cart.length > 0 ? cart.map(item => item.amount).reduce((a, b) => a + b) : 0;
+}
+
+async function addProductToCart(product_id) {
+  const product = await getProductById(product_id);
+  let found = false;
+  cart.forEach(item => {
+    if(product.id === item.product.id) {
+      item.amount++;
+      found = true;
+    }
+  });
+  if(!found) {
+    cart.push({product, amount: 1});
+  }
+  document.getElementById('num-products').innerHTML = `${getCartNumItems()}`;
+  modalProductDetail.hide();
 }
 
 function printCategories(categories) {
