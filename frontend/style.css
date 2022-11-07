@@ -38,6 +38,7 @@ nav {
 
 nav.navbar {
   background-color: var(--bg-color);
+  --bs-navbar-padding-x: 20px;
 }
 
 .navLink {
@@ -87,17 +88,17 @@ nav.navbar {
 }
 
 .user-info-icon {
-  width: 35px;
+  width: 30px;
 }
 
 .user-info-name {
-  font-size: 22px;
+  font-size: 20px;
+  font-weight: 100;
 }
 
 .user-options {
-  margin-top: 5px;
-  border: 0.5px solid #0f111143;
-  border-radius: 5px;
+  margin-top: 10px;
+  border-radius: 10px;
   position: absolute;
   width: 100%;
   display: flex;
@@ -105,7 +106,7 @@ nav.navbar {
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.5s ease-out;
-  background-color: white;
+  background-color: var(--primary-color);
   z-index: 990;
 }
 
@@ -116,7 +117,7 @@ nav.navbar {
 }
 
 .user-options span:hover {
-  background-color: rgba(230, 220, 220, 0.427);
+  background-color: #712ac8;
 }
 
 .arrow-options {
@@ -134,7 +135,7 @@ nav.navbar {
 }
 
 .cart-img {
-  width: 30px;
+  width: 25px;
 }
 
 .cart-area {
@@ -170,16 +171,16 @@ nav.navbar {
 .num-products {
   background-color: red;
   color: white;
-  font-weight: bold;
+  font-weight: 400;
   position: absolute;
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   border-radius: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
   right: 0px;
-  top: 0px;
+  top: 5px;
 }
 
 main {
