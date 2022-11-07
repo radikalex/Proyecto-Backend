@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;900&display=swap");
 
 :root {
   --primary-color: #923bff;
@@ -53,29 +53,29 @@ nav.navbar {
 
 .btn-primary {
   background-color: var(--primary-color);
-  font-weight: 300;
-  color: whitesmoke;
+  font-weight: 400;
+  color: white;
   border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
-  background-color: var(--bg-color);
-  font-weight: 300;
-  color: whitesmoke;
+  background-color: #270057;
+  font-weight: 400;
+  color: white;
   border-color: var(--primary-color);
 }
 
 .btn-secondary {
-  background-color: var(--bg-color);
-  font-weight: 300;
-  color: whitesmoke;
+  background-color: white;
+  font-weight: 400;
+  color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
 .btn-secondary:hover {
-  background-color: var(--primary-color);
-  font-weight: 300;
-  color: whitesmoke;
+  background-color: #270057;
+  font-weight: 400;
+  color: white;
   border-color: var(--primary-color);
 }
 
@@ -245,16 +245,16 @@ footer {
 }
 
 .sidebar-filters li:hover {
-  background-color: var(--primary-color);
+  background-color: #270057;
   color: whitesmoke;
   border-radius: 5px;
 }
 
 .category-active {
-  background-color: var(--primary-color);
-  pointer-events: none;
+  background-color: var(--primary-color);  
   color: whitesmoke;
   border-radius: 5px;
+  pointer-events: none;
 }
 
 .price-input {
@@ -350,7 +350,6 @@ footer {
   margin: 0.5%;
   padding: 0 10px;
   cursor: pointer;
-  
 }
 
 .product-name {
@@ -413,17 +412,22 @@ footer {
   width: 80%;
 }
 
+.modal-header {
+  background-color: rgba(232, 232, 232, 0.9);
+  color: var(--primary-color);
+}
+
 .detail-name {
   display: block;
-  font-weight: 700;
-  font-size: 19px;
+  font-weight: 500;
+  font-size: 20px;
 }
 
 .detail-price {
   display: block;
   font-weight: 700;
   font-size: 32px;
-  color: #ff6000;
+  color: var(--primary-color);
 }
 
 .detail-description {
