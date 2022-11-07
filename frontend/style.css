@@ -264,11 +264,11 @@ footer {
 }
 
 .form-control:focus {
-  box-shadow: 0px 0px 0px 4px #712ac87c;
+  box-shadow: 0px 0px 0px 4px #5b00ca8f;
 }
 
 .form-select:focus {
-  box-shadow: 0px 0px 0px 4px #712ac87c;
+  box-shadow: 0px 0px 0px 4px #5b00ca8f;
 }
 
 .price-label {
@@ -365,7 +365,7 @@ footer {
   text-align: right;
   margin-top: auto;
   margin-bottom: 10px;
-  background-color: var(--bg-color);
+  background-color: #270057;
   padding: 0 10px;
   border-radius: 5px 5px 5px 5px;
 }
