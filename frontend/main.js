@@ -12,6 +12,7 @@ let category_active = 0;
 let min_price = "1";
 let max_price = "9999";
 let priceOrder = "";
+let stars_review = 1;
 
 let modalSignUp, modalLogIn, modalProductDetail, cartModal;
 
@@ -300,12 +301,12 @@ async function signUp(e) {
     pop_alert.innerHTML = `Welcome to our page ${user.name}! You can now log in.`;
     alerts_div.appendChild(pop_alert);
     
-    setTimeout(() => pop_alert.remove(), 1000);
+    setTimeout(() => pop_alert.remove(), 2000);
 
     setTimeout(() => {
       modalSignUp.hide();
       btn_signUp.disabled = false;
-    }, 1000);
+    }, 2000);
 
   } catch(err) {
     console.error(err);
@@ -338,40 +339,116 @@ async function showOrdersUser() {
     const res = await axios.post(`http://localhost:3000/users/getUserWithOrderById`, {}, { headers })
     const user = res.data;
     let orders_innerHtml = ``;
-    for (const order of user.Orders) {
-      console.log(user.Orders);
-      const total_price = order.Products.map((product => product.price*product.Order_detail.amount)).reduce((a,b) => a+b)
-      orders_innerHtml += 
-      `
-      <div class="order">
-        <div class="order-header">
-          <span><b>Date:</b> ${order.date.substring(0, 10)}</span> 
-          <span><b>Total cost of the order:</b> ${total_price}$</span>
-          <span>${order.Products.length} ${order.Products.length > 1 ? "articles" : "article"}</span>
-        </div>
-      `;
-      for (const product of order.Products) {
+    if(user.Orders.length === 0) {
+      orders_innerHtml += `<span>You have no orders yet.</span>`
+    }
+    else {
+      for (const order of user.Orders) {
+        const total_price = order.Products.map((product => product.price*product.Order_detail.amount)).reduce((a,b) => a+b)
         orders_innerHtml += 
         `
-          <div class="order-product">
-            <div class="order-product-image"><img class="order-product-img" src="../product_images/${product.img_product}"></div>
-            <div class="order-product-name">${product.name}</div>
-            <div class="order-product-price">${product.price}$</div>
-            <div class="order-product-amount">${product.Order_detail.amount} ${product.Order_detail.amount > 1 ? "units" : "unit"}</div>
+        <div class="order">
+          <div class="order-header">
+            <span><b>Date:</b> ${order.date.substring(0, 10)}</span> 
+            <span><b>Total cost of the order:</b> ${total_price}$</span>
+            <span>${order.Products.length} ${order.Products.length > 1 ? "articles" : "article"}</span>
           </div>
+        `;
+        for (const product of order.Products) {
+          orders_innerHtml += 
+          `
+            <div class="order-product">
+              <div class="order-product-image"><img class="order-product-img" src="../product_images/${product.img_product}"></div>
+              <div class="order-product-name">${product.name}</div>
+              <div class="order-product-price">${product.price}$</div>
+              <div class="order-product-amount">${product.Order_detail.amount} ${product.Order_detail.amount > 1 ? "units" : "unit"}</div>
+            </div>
+          `
+        }
+        orders_innerHtml += 
         `
+        </div>
+        `;
       }
-      orders_innerHtml += 
-      `
-      </div>
-      `;
     }
+    
     bodyOrdersModal.innerHTML = orders_innerHtml;
     let myModal = new bootstrap.Modal(document.getElementById("ordersModal"), {});
     myModal.show();
   } catch(error) {
     console.error(error);
   }
+}
+
+function showWriteReview(product_id) {
+  stars_review = 1;
+  const div = document.getElementById('write-review');
+  div.innerHTML = 
+  `
+    <form class="form-writeReview" onsubmit="sendReview()">
+      <div>
+        <div class="rating-review">
+          <b>Rating:</b>
+          <div id="review-stars">
+            <span onclick="setRating(1)" class="fa fa-star checked"></span>
+            <span onclick="setRating(2)" class="fa fa-star"></span>
+            <span onclick="setRating(3)" class="fa fa-star"></span>
+            <span onclick="setRating(4)" class="fa fa-star"></span>
+            <span onclick="setRating(5)" class="fa fa-star"></span>
+          </div>
+        </div>
+      </div>
+      <textarea id="textarea-review" class="form-control textarea-review" rows="3" placeholder="Write your review here..."></textarea>
+      <div class="buttons-review">
+        <button class="btn btn-secondary" onclick="closeReview()">Close</button>
+        <button class="btn btn-primary" onclick="sendReview(event, ${product_id})">Send</button>
+      </div>
+    <form>
+  `;
+}
+
+async function sendReview(e, product_id) {
+  e.preventDefault();
+
+  const user_session = JSON.parse(localStorage.getItem('user_session'));
+  const headers = {
+    'Authorization': user_session.token
+  };
+  const body = {
+    "content": document.getElementById('textarea-review').value,
+    "rating": stars_review,
+    "product_id": product_id
+  }
+  
+  try {
+    const res = await axios.post(`http://localhost:3000/reviews/createReview`, body, { headers });
+    closeReview();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function setRating(num) {
+  let active_stars = num;
+  stars_review = num;
+  const div_stars = document.getElementById('review-stars');
+
+  for(let star of div_stars.children) {
+    if(active_stars > 0) {
+      star.className = "fa fa-star checked";
+      active_stars--;
+    } else {
+      star.className = "fa fa-star";
+    }
+  }
+}
+
+function closeReview() {
+  const div = document.getElementById('write-review');
+  div.innerHTML = 
+  `
+    <button onclick="showWriteReview()" class="btn btn-primary btn-review">Write a review</button>
+  `;
 }
 
 async function goProductDetail(product_id) {
@@ -411,6 +488,15 @@ async function goProductDetail(product_id) {
         <div class="reviews-title">Reviews</div>
         <hr>
   `;
+
+  const user_session = JSON.parse(localStorage.getItem('user_session'));
+  if(user_session) {
+    product_innerHTML += 
+    `
+      <div id="write-review" class="d-flex justify-content-center"><button onclick="showWriteReview(${product.id})" class="btn btn-primary btn-review">Write a review</button></div>
+    `
+  }
+
 
   if(product.Reviews.length > 0) {
     product_innerHTML += `
@@ -523,7 +609,7 @@ function printPriceFilter() {
         <select class="form-select order-select" onchange="changeOrder(this)">
           <option value="">None</option>
           <option value="ASC">Lower to higher</option>
-          <option value="DESC">Higuer to lower</option>
+          <option value="DESC">Higher to lower</option>
         </select>
       </div>
     </div>
