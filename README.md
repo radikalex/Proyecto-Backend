@@ -43,13 +43,16 @@ When you log in you can add each product to your shopping cart and then buy them
 3 - You should rename the "config-example.json" file to "config.json" 
 > Then edit the "development" fields with your "name", "password", "db name" and "secret word".
 
-4 - Database Migration
+4 - Create Database
+> sequelize db:create
+
+5 - Database Migration
 > sequelize db:migrate
 
-5 - Running the Seeder
+6 - Running the Seeder
 > sequelize db:seed:all
 
-6 - The project is ready to start
+7 - The project is ready to start
 > npm start
 
 # 📷 Preview 
