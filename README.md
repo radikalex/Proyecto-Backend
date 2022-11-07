@@ -31,6 +31,27 @@ In the products section you have a sidebar to filter by category, price and sort
 
 When you log in you can add each product to your shopping cart and then buy them, these are saved in your user as purchase orders. Likewise, in each product you can leave a review to evaluate it and that other users can trust in buying the same product.
 
+# 📋 Pre requirements
+
+1 - In order to start the project first make a clone:
+
+> git clone https://github.com/Fede-Arevalo/Proyecto-Backend.git
+
+2 - Once the project is cloned, you must install the necessary modules with npm:
+> npm install
+
+3 - You should rename the "config-example.json" file to "config.json" 
+> Then edit the "development" fields with your "name", "password", "db name" and "secret word".
+
+4 - Database Migration
+> sequelize db:migrate
+
+5 - Running the Seeder
+> sequelize db:seed:all
+
+6 - The project is ready to start
+> npm start
+
 # 📷 Preview 
 
 ### SQL diagram 
