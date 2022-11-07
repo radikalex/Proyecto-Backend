@@ -201,6 +201,8 @@ function switchCategory(id) {
 
 function showLogInModal(e) {
   e.preventDefault();
+  document.getElementById('login-email').value = "";
+  document.getElementById('login-password').value = "";
   modalLogIn = new bootstrap.Modal(document.getElementById("logInModal"), {});
   modalLogIn.show();
 }
@@ -260,6 +262,10 @@ async function logOut() {
 
 function showSignUpModal(e) {
   e.preventDefault();
+  document.getElementById('signup-name').value = "";
+  document.getElementById('signup-email').value = "";
+  document.getElementById('signup-password').value = "";
+  document.getElementById('signup-password2').value = "";
   modalSignUp = new bootstrap.Modal(document.getElementById("signUpModal"), {});
   modalSignUp.show();
 }
