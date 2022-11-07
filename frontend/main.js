@@ -422,7 +422,8 @@ async function sendReview(e, product_id) {
   
   try {
     const res = await axios.post(`http://localhost:3000/reviews/createReview`, body, { headers });
-    closeReview();
+    getProductsQuery();
+    goProductDetail(product_id, false);
   } catch (error) {
     console.error(error);
   }
@@ -451,12 +452,14 @@ function closeReview() {
   `;
 }
 
-async function goProductDetail(product_id) {
+async function goProductDetail(product_id, showModal) {
   
   const product = await getProductById(product_id);
   document.getElementById('productModalTitle').innerHTML = `${product.name}`
-  modalProductDetail = new bootstrap.Modal(productModal, {});
-  modalProductDetail.show();
+  if(showModal) {
+    modalProductDetail = new bootstrap.Modal(productModal, {});
+    modalProductDetail.show();
+  }
 
   let product_innerHTML = `
         <div class="product-info">
@@ -493,7 +496,9 @@ async function goProductDetail(product_id) {
   if(user_session) {
     product_innerHTML += 
     `
-      <div id="write-review" class="d-flex justify-content-center"><button onclick="showWriteReview(${product.id})" class="btn btn-primary btn-review">Write a review</button></div>
+      <div class="d-flex justify-content-center">
+        <div id="write-review" class="d-flex justify-content-center"><button onclick="showWriteReview(${product.id})" class="btn btn-primary btn-review">Write a review</button></div>
+      </div>
     `
   }
 
@@ -664,7 +669,7 @@ function printProducts(products) {
     } else {
         for (const product of products) {
           let card_innerHtml = `
-          <div class="card" onclick="goProductDetail( ${product.id})">
+          <div class="card" onclick="goProductDetail( ${product.id}, true)">
             <div class="product-img"><img class="card-img" src="../product_images/${product.img_product}"></div>
             <div class="product-name">${product.name}</div>`;
           if(product.Reviews.length > 0) {
