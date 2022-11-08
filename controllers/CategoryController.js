@@ -25,29 +25,37 @@ const CategoryController = {
     },
     async updateCategoryById(req, res) {
         try {
-          await Category.update({ name: req.body.name },
-            {
-              where: {
-                id: req.params.id,
-              },
+            const category = await Category.findByPk(req.params.id);
+            if(category) {
+                await Category.update({ name: req.body.name },
+                {
+                    where: {
+                        id: req.params.id,
+                    },
+                });
+                res.send({ msg: "Category updated" });
             }
-          );
-          res.send({ msg: "Category updated" });
+            else {
+                res.status(404).send({msg: `Error: No category with id ${req.params.id} found`});
+            }
         } catch (error) {
-          console.error(error);
-          res
-            .status(500)
-            .send({ msg: "There was an error updating the category", error });
+            console.error(error);
+            res
+                .status(500)
+                .send({ msg: "There was an error updating the category", error });
         }
     },
-    async deleteCategory(req, res) {
+    async deleteCategoryById(req, res) {
         try {
-            await Category.destroy({
+            const rows = await Category.destroy({
               where: {
                 id: req.params.id,
               },
             });
-            res.send({ msg: "Category deleted" });
+            if(rows)
+                res.send({ msg: "Category deleted" });
+            else
+                res.status(404).send({msg: `Error: No category with id ${req.params.id} found`});
           } catch (error) {
             console.error(error);
             res
@@ -58,7 +66,10 @@ const CategoryController = {
     async getCategoryById(req, res) {
         try {
             const category = await Category.findByPk(req.params.id);
-            res.send(category);
+            if(!category)
+                res.status(404).send({msg: `Error: No category with id ${req.params.id} found`});
+            else
+                res.send(category);
         } catch (error) {
             console.error(error);
             res
@@ -68,14 +79,17 @@ const CategoryController = {
     },
     async getCategoriesByName(req, res) {
         try {
-            const category = await Category.findAll({
+            const categories = await Category.findAll({
                 where: {
                     name: {
                         [Op.like]: `%${req.params.name}%`,
                     },
                 }
             });
-            res.send(category);
+            if(categories.length > 0)
+                res.send(categories);
+            else 
+                res.status(404).send({msg: `Error: No categories with '${req.params.name}' in their name`});
         } catch (error) {
             console.error(error);
             res
