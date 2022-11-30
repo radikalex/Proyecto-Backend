@@ -101,6 +101,21 @@ const UserController = {
       res.status(500).send({ msg: "There was an error getting user", error });
     }
   },
+  async getInfoUser(req, res) {
+    try {
+      const user = await User.findByPk(req.user.id, {
+        attributes: {
+          exclude: [ "createdAt", "updatedAt"],
+        },
+      });
+      res.send({msg: "This is the user logged" , user});
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error getting the user's info", error });
+    }
+  },
 
   async updateUserById(req, res) {
     try {
@@ -136,6 +151,8 @@ const UserController = {
         .send({ msg: "There was an error deleting the user", error });
     }
   },
+
+
 };
 
 module.exports = UserController;
