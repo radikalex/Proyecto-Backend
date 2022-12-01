@@ -4,9 +4,10 @@ const { Op } = Sequelize;
 const OrderController = {
   async createOrder(req, res) {
     try {
+      console.log(req.user.id)
       const order = await Order.create({
-        date: req.body.date,
-        user_id: req.body.user_id,
+        date: new Date(),
+        user_id: req.user.id,
       });
 
       for (const product of req.body.products) {
