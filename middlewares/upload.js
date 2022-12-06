@@ -1,31 +1,41 @@
 const multer  = require('multer');
 const fs = require("fs");
 const path = require('path');
+const mimetypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dir = path.resolve('./product_images/uploads');
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
-    cb(null, "./product_images/uploads");
-  },
-  filename: function (req, file, cb) {
-    const filename = `${Date.now()}-${file.originalname}`
-    req.body.img_product = "uploads/" + filename;
-    cb(null, filename);
-  },
+const generateMulter = imgFolderName => multer({
+  storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+          const dir_img = path.resolve(`./images/${imgFolderName}/uploads`);
+          if (!fs.existsSync(dir_img)) {
+              fs.mkdirSync(dir_img);
+          }
+          cb(null, `./images/${imgFolderName}/uploads`)
+      },
+      filename: (req, file, cb) => {
+          const filename = `${Date.now()}-${file.originalname}`;
+          switch(imgFolderName) {
+              case 'users_images':
+                  req.body.user_img = "users_images/uploads/" + filename;
+                  break;
+              case 'products_images':
+                  req.body.img_product= "products_images/uploads/" + filename;
+                  break;
+              case 'reviews_images':
+                  req.body.review_img = "reviews_images/uploads/" + filename;
+                  break;
+          }
+          cb(null, filename)
+      }
+  }),
+  fileFilter: (req, file, cb) => {
+      if (mimetypes.includes(file.mimetype)) cb(null, true)
+      else cb(null, false)
+  }
 });
 
-const upload = multer({ 
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    if( (/image\/(jpeg|tiff|png|webp|bmp|jpg)$/gi).test(file.mimetype) ) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
-  }
-})
+const uploadUserImages = generateMulter('users_images');
+const uploadProductImages = generateMulter('products_images');
+const uploadReviewImages = generateMulter('reviews_images');
 
-module.exports = upload;
+module.exports = { uploadUserImages, uploadProductImages, uploadReviewImages };

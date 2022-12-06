@@ -10,6 +10,17 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       User.hasMany(models.Order, { foreignKey: "user_id" });
       User.hasMany(models.Review, { foreignKey: "user_id" });
+      User.belongsToMany(models.Product, {
+        as: 'FavouriteProductsList',
+        through: models.FavouriteProduct,
+        foreignKey: "user_id",
+        otherKey: "product_id",
+      });
+      User.belongsToMany(models.Review, {
+        through: models.ReviewLike,
+        foreignKey: "user_id",
+        otherKey: "review_id",
+      });
     }
   }
   User.init(

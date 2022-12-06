@@ -11,7 +11,7 @@ app.use('/categories', require('./routes/categories'));
 app.use('/orders', require('./routes/orders'));
 app.use('/reviews', require('./routes/reviews'));
 
-app.use(express.static('./product_images'))
+app.use(express.static('./images'))
 
 
 app.listen(PORT, () => console.log('Servidor levantado en el puerto ' + PORT))

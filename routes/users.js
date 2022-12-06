@@ -6,6 +6,15 @@ const { checkIfEmailExist } = require("../middlewares/checkIfEmailExist");
 const validateBodyParams = require("../middlewares/validateBodyParams");
 const { check } = require("express-validator");
 
+router.get("/getUsers", UserController.getUsers);
+router.get("/getInfoUser", authentication, UserController.getInfoUser);
+
+router.put("/updateUserById/id/:id", UserController.updateUserById);
+router.put("/addFavouriteProduct", authentication, UserController.addFavouriteProduct);
+router.put("/removeFavouriteProduct", authentication, UserController.removeFavouriteProduct);
+router.put("/giveLikeReview", authentication, UserController.giveLikeReview);
+router.put("/removeLikeReview", authentication, UserController.removeLikeReview);
+
 router.post(
   "/createUser",
   [
@@ -17,16 +26,15 @@ router.post(
   checkIfEmailExist,
   UserController.createUser
 );
-router.get("/getUsers", UserController.getUsers);
-router.get("/getInfoUser", authentication, UserController.getInfoUser);
-router.put("/updateUserById/id/:id", UserController.updateUserById);
-router.delete("/deleteUserById/id/:id", UserController.deleteUserById);
-router.post("/login", UserController.login);
-router.delete("/logout", authentication, UserController.logout);
 router.post(
   "/getUserWithOrderById",
   authentication,
   UserController.getUserWithOrderById
 );
+router.post("/login", UserController.login);
+
+router.delete("/logout", authentication, UserController.logout);
+router.delete("/deleteUserById/id/:id", UserController.deleteUserById);
+
 
 module.exports = router;

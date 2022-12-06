@@ -1,4 +1,4 @@
-const { User, Sequelize, Token, Order, Product } = require("../models/index");
+const { User, Sequelize, Token, Order, Product, FavouriteProduct, Review, ReviewLike } = require("../models/index");
 const { Op } = Sequelize;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -101,12 +101,30 @@ const UserController = {
       res.status(500).send({ msg: "There was an error getting user", error });
     }
   },
+
   async getInfoUser(req, res) {
     try {
       const user = await User.findByPk(req.user.id, {
         attributes: {
-          exclude: [ "createdAt", "updatedAt"],
+          exclude: [ "password", "role", "createdAt", "updatedAt"],
         },
+        include: [
+          {
+            model: Order,
+            attributes: ["id", "date"],
+            include: [
+              {
+                model: Product,
+                attributes: { exclude: ["createdAt", "updatedAt"] },
+              },
+            ],
+          },
+          {
+            model: Product,
+            as: 'FavouriteProductsList',
+            attributes: ["id", "name", "price", "img_product"]
+          }
+        ],
       });
       res.send({msg: "This is the user logged" , user});
     } catch (error) {
@@ -152,7 +170,128 @@ const UserController = {
     }
   },
 
+  async addFavouriteProduct(req, res) {
+    try {
+      const user = await User.findByPk(req.user.id, {
+        attributes: {
+          exclude: [ "createdAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: Product,
+            Product: ["id"]
+          }
+        ],
+      });
+      const productIds = user.Products.map( product => product.id )
+      if(productIds.includes(req.body.product_id)) {
+        res.send({msg: "You already have this product in your favourites list"});
+      } else {
+        await FavouriteProduct.create({user_id: req.user.id, product_id: req.body.product_id})
+        res.send({msg: "Favourite product added"});
+      }
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error adding a product as favourite", error });
+    }
+  },
 
+  async removeFavouriteProduct(req, res) {
+    try {
+      const user = await User.findByPk(req.user.id, {
+        attributes: {
+          exclude: [ "createdAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: Product,
+            Product: ["id"]
+          }
+        ],
+      });
+      const productIds = user.Products.map( product => product.id )
+      if(!productIds.includes(req.body.product_id)) {
+        res.send({msg: "You do not have this product in your favourites list"});
+      } else {
+        await FavouriteProduct.destroy({ 
+          where: { 
+            user_id: req.user.id, 
+            product_id: req.body.product_id
+          } 
+        })
+        res.send({msg: "Product removed from favourite list"});
+      }
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error removing favourite product", error });
+    }
+  },
+
+
+  async giveLikeReview(req, res) {
+    try {
+      const user = await User.findByPk(req.user.id, {
+        attributes: {
+          exclude: [ "createdAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: Review,
+            Review: ["id"]
+          }
+        ],
+      });
+      const reviewsIds = user.Reviews.map( review => review.id )
+      if(reviewsIds.includes(req.body.review_id)) {
+        res.send({msg: "You had already liked this review"});
+      } else {
+        await ReviewLike.create({user_id: req.user.id, review_id: req.body.review_id})
+        res.send({msg: "Succesful like to review"});
+      }
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error giving like to a review", error });
+    }
+  },
+
+  async removeLikeReview(req, res) {
+    try {
+      const user = await User.findByPk(req.user.id, {
+        attributes: {
+          exclude: [ "createdAt", "updatedAt"],
+        },
+        include: [
+          {
+            model: Review,
+            Review: ["id"]
+          }
+        ],
+      });
+      const reviewsIds = user.Reviews.map( review => review.id )
+      if(!reviewsIds.includes(req.body.review_id)) {
+        res.send({msg: "This review does not have your like"});
+      } else {
+        await ReviewLike.destroy({ 
+          where: { 
+            user_id: req.user.id, 
+            review_id: req.body.review_id
+          } 
+        })
+        res.send({msg: "Succesful remove like from a review"});
+      }
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: "There was an error removing like from a review", error });
+    }
+  },
 };
 
 module.exports = UserController;
