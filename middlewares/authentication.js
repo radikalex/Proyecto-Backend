@@ -1,4 +1,4 @@
-const { User, Token, Sequelize } = require("../models");
+const { User, Token, Sequelize, Review } = require("../models");
 const { Op } = Sequelize;
 const jwt = require("jsonwebtoken");
 const { jwt_secret } = require("../config/config.json")["development"];
@@ -14,7 +14,7 @@ const authentication = async (req, res, next) => {
       },
     });
     if (!tokenFound) {
-      res.status(401).send({ message: "You are not authorized" });
+      return res.status(401).send({ message: "You are not authorized" });
     }
     req.user = user;
     next();
@@ -36,4 +36,19 @@ const isAdmin = async (req, res, next) => {
   next();
 };
 
-module.exports = { authentication, isAdmin };
+const isReviewAuthor = async (req, res, next) => {
+  try {
+    const review = await Review.findByPk(req.params.id);
+    if(!review)
+      return res.status(404).send({ message: `No review with id ${req.params.id}` });
+    if(review.user_id !== req.user.id)
+      return res.status(403).send({ message: 'This review is not yours' });
+  } catch (error) {
+    console.error(error)
+    return res.status(500).send({ error, message: 'There was a problem verifying the authorship of the review' })
+  }
+  next();
+};
+
+
+module.exports = { authentication, isAdmin, isReviewAuthor };

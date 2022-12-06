@@ -56,7 +56,7 @@ const ProductController = {
           product.img_product !== req.body.img_product &&
           !/default\/.*/gm.test(product.img_product)
         ) {
-          const dir = path.resolve("./product_images");
+          const dir = path.resolve("./images");
           await unlink(path.join(dir, product.img_product));
         }
         res.send({ msg: "Product updated" });
@@ -83,7 +83,7 @@ const ProductController = {
           .send({ msg: `Error: No product with id ${req.params.id} found` });
       }
       if (!/default\/.*/gm.test(product.img_product)) {
-        const dir = path.resolve("./product_images");
+        const dir = path.resolve("./images");
         await unlink(path.join(dir, product.img_product));
       }
       await Product.destroy({
@@ -107,7 +107,7 @@ const ProductController = {
         },
         include: [
           { model: Category, attributes: ["name"] },
-          { model: Review, attributes: ["content", "rating"], include: [{ model: User, attributes: ["name"]}]},
+          { model: Review, attributes: ["title", "content", "rating", "review_img"], include: [{ model: User, attributes: ["name"]}]},
         ],
       });
       if (!product)

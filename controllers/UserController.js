@@ -179,11 +179,12 @@ const UserController = {
         include: [
           {
             model: Product,
+            as: 'FavouriteProductsList',
             Product: ["id"]
           }
         ],
       });
-      const productIds = user.Products.map( product => product.id )
+      const productIds = user.FavouriteProductsList.map( product => product.id )
       if(productIds.includes(req.body.product_id)) {
         res.send({msg: "You already have this product in your favourites list"});
       } else {
@@ -207,11 +208,12 @@ const UserController = {
         include: [
           {
             model: Product,
+            as: 'FavouriteProductsList',
             Product: ["id"]
           }
         ],
       });
-      const productIds = user.Products.map( product => product.id )
+      const productIds = user.FavouriteProductsList.map( product => product.id )
       if(!productIds.includes(req.body.product_id)) {
         res.send({msg: "You do not have this product in your favourites list"});
       } else {

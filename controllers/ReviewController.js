@@ -1,8 +1,14 @@
 const { Review, User, Sequelize } = require("../models/index");
+const { unlink } = require("fs/promises");
+const path = require("path");
 
 const ReviewController = {
   async createreview(req, res) {
     try {
+      const reviews = await Review.findAll({ where: { product_id: req.body.product_id, user_id: req.user.id } })
+      if(reviews.length > 0) {
+        return res.status(400).send({ msg: "This product already has a review from you" })
+      }
       const review = await Review.create({ ...req.body, user_id: req.user.id });
       res.status(201).send({ msg: "Review created", review });
     } catch (error) {
@@ -31,12 +37,33 @@ const ReviewController = {
 
   async updateReviewById(req, res) {
     try {
+      const review = await Review.findByPk(req.params.id);
+      if (!review) {
+        const dir = path.resolve("./images");
+        await unlink(path.join(dir, req.body.review_img));
+        return res
+          .status(404)
+          .send({ msg: `Error: No review with id ${req.params.id} found` });
+      }
+
+      if (
+        review.review_img &&
+        review.review_img !== req.body.review_img &&
+        !/default\/.*/gm.test(review.review_img)
+      ) {
+        const dir = path.resolve("./images");
+        await unlink(path.join(dir, review.review_img));
+      }
+
       await Review.update(
         {
+          title: req.body.title,
           content: req.body.content,
           rating: req.body.rating,
+          review_img: req.body.review_img,
           product_id: req.body.product_id,
-          user_id: req.body.user_id,
+          user_id: req.body.user_id,  
+
         },
         {
           where: {
@@ -55,6 +82,16 @@ const ReviewController = {
 
   async deleteReviewById(req, res) {
     try {
+      const review = await Review.findByPk(req.params.id);
+      if (!review) {
+        return res
+          .status(404)
+          .send({ msg: `Error: No review with id ${req.params.id} found` });
+      }
+      if (review.review_img && !/default\/.*/gm.test(review.review_img)) {
+        const dir = path.resolve("./images");
+        await unlink(path.join(dir, review.review_img));
+      }
       await Review.destroy({
         where: {
           id: req.params.id,

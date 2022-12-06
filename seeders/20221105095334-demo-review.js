@@ -6,7 +6,6 @@ module.exports = {
     return queryInterface.bulkInsert("Reviews", [
       {
         title: 'Pretty good',
-        review_img: 'path',
         content: "Good keyboard quality, although key noise can be annoying",
         rating: 4,
         product_id: 1,
@@ -16,7 +15,7 @@ module.exports = {
       },
       {
         title: 'Just what I needed',
-        review_img: 'path',
+        review_img: 'reviews_images/default/review-rtx3088.jpg',
         content: "I was looking forward to having this graphics card, now I can play the games in ultra quality. Happy with the purchase!",
         rating: 5,
         product_id: 2,
@@ -26,7 +25,6 @@ module.exports = {
       },
       {
         title: 'I recommend it',
-        review_img: 'path',
         content: "I bought this laptop 2 weeks ago. I use it to teach my programming classes and it works great",
         rating: 4,
         product_id: 6,
@@ -36,7 +34,6 @@ module.exports = {
       },
       {
         title: 'Too exponsive',
-        review_img: 'path',
         content: "Controller works fine but it's too expensive",
         rating: 3,
         product_id: 3,
@@ -46,7 +43,6 @@ module.exports = {
       },
       {
         title: 'I do not recommend it',
-        review_img: 'path',
         content: "160 dollars to be able to have Windows 11 is too expensive, I hope they lower the price soon",
         rating: 2,
         product_id: 5,
@@ -56,7 +52,6 @@ module.exports = {
       },
       {
         title: 'You should buy it',
-        review_img: 'path',
         content: "With this router I no longer have internet problems while playing online. It's expensive, but I recommend it",
         rating: 4,
         product_id: 4,
@@ -66,7 +61,6 @@ module.exports = {
       },
       {
         title: 'Maybe the motherboard is good but it came to me broken',
-        review_img: 'path',
         content: "The motherboard arrived in bad condition. I have had to return it",
         rating: 1,
         product_id: 7,
@@ -76,7 +70,6 @@ module.exports = {
       },
       {
         title: 'Awful',
-        review_img: 'path',
         content: "I was killed in a game while using this controller. It must be a problem with the controller, not mine. I can't fail",
         rating: 1,
         product_id: 3,
