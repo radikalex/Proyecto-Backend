@@ -18,6 +18,21 @@ const ReviewController = {
     }
   },
 
+  async getReviewById(req, res) {
+    try {
+      const review = await Review.findByPk(req.params.id);
+      if(review)
+        res.status(200).send({ msg: `This is the review with id ${req.params.id}`, review });
+      else
+        res.status(404).send({ msg: `Review with id ${req.params.id} not found` });
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ msg: `There was an error getting a review with id ${req.params.id}`, error });
+    }
+  },
+
   async getReviews(req, res) {
     try {
       const reviews = await Review.findAll({
@@ -40,13 +55,15 @@ const ReviewController = {
       const review = await Review.findByPk(req.params.id);
       if (!review) {
         const dir = path.resolve("./images");
-        await unlink(path.join(dir, req.body.review_img));
+        if(req.body.review_img)
+          await unlink(path.join(dir, req.body.review_img));
         return res
           .status(404)
           .send({ msg: `Error: No review with id ${req.params.id} found` });
       }
 
       if (
+        req.body.review_img &&
         review.review_img &&
         review.review_img !== req.body.review_img &&
         !/default\/.*/gm.test(review.review_img)

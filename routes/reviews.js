@@ -6,6 +6,7 @@ const { uploadReviewImages } = require("../middlewares/upload");
 
 router.post("/createreview", authentication, uploadReviewImages.single('review_img'), ReviewController.createreview);
 router.get("/getReviews", ReviewController.getReviews);
+router.get("/getReviewById/:id", ReviewController.getReviewById);
 router.put(
   "/updateReviewById/:id",
   authentication,

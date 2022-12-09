@@ -53,6 +53,7 @@ const ProductController = {
           }
         );
         if (
+          req.body.img_product &&
           product.img_product !== req.body.img_product &&
           !/default\/.*/gm.test(product.img_product)
         ) {
@@ -62,7 +63,8 @@ const ProductController = {
         res.send({ msg: "Product updated" });
       } else {
         const dir = path.resolve("./product_images");
-        await unlink(path.join(dir, req.body.img_product));
+        if(req.body.img_product)
+          await unlink(path.join(dir, req.body.img_product));
         res
           .status(404)
           .send({ msg: `Error: No product with id ${req.params.id} found` });
