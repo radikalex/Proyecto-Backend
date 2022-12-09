@@ -6,6 +6,7 @@ const { jwt_secret } = require("../config/config.json")["development"];
 const authentication = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
+    console.log(token);
     const payload = jwt.verify(token, jwt_secret);
     const user = await User.findByPk(payload.id);
     const tokenFound = await Token.findOne({
