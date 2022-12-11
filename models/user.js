@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "product_id",
       });
       User.belongsToMany(models.Review, {
+        as: 'ReviewsLiked',
         through: models.ReviewLike,
         foreignKey: "user_id",
         otherKey: "review_id",

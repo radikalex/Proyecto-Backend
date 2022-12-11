@@ -109,7 +109,19 @@ const ProductController = {
         },
         include: [
           { model: Category, attributes: ["name"] },
-          { model: Review, attributes: ["id", "content", "rating", "review_img", "updatedAt"], include: [{ model: User, attributes: ["id", "name", "user_img"]}]},
+          { 
+            model: Review, attributes: ["id", "content", "rating", "review_img", "updatedAt"], 
+            include: [
+              { 
+                model: User, 
+                attributes: ["id", "name", "user_img"]
+              }, 
+              { 
+                model: User, 
+                as: 'ReviewsLiked',
+                attributes: ["id", "name", "user_img"],
+              }]
+          },
         ],
       });
       if (!product)

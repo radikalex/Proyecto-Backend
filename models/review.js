@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       Review.belongsTo(models.Product, { foreignKey: "product_id" });
       Review.belongsTo(models.User, { foreignKey: "user_id" });
       Review.belongsToMany(models.User, {
+        as: 'ReviewsLiked',
         through: models.ReviewLike,
         foreignKey: "review_id",
         otherKey: "user_id",

@@ -123,7 +123,12 @@ const UserController = {
             model: Product,
             as: 'FavouriteProductsList',
             attributes: ["id", "name", "price", "img_product"]
-          }
+          },
+          {
+            model: Review,
+            as: 'ReviewsLiked',
+            attributes: ["id"]
+          },
         ],
       });
       res.send({msg: "This is the user logged" , user});
@@ -243,11 +248,12 @@ const UserController = {
         include: [
           {
             model: Review,
+            as: 'ReviewsLiked',
             Review: ["id"]
           }
         ],
       });
-      const reviewsIds = user.Reviews.map( review => review.id )
+      const reviewsIds = user.ReviewsLiked.map( review => review.id )
       if(reviewsIds.includes(req.body.review_id)) {
         res.send({msg: "You had already liked this review"});
       } else {
@@ -271,11 +277,12 @@ const UserController = {
         include: [
           {
             model: Review,
+            as: 'ReviewsLiked',
             Review: ["id"]
           }
         ],
       });
-      const reviewsIds = user.Reviews.map( review => review.id )
+      const reviewsIds = user.ReviewsLiked.map( review => review.id )
       if(!reviewsIds.includes(req.body.review_id)) {
         res.send({msg: "This review does not have your like"});
       } else {

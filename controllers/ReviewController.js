@@ -63,7 +63,7 @@ const ReviewController = {
       }
 
       if (
-        req.body.review_img &&
+        (req.body.review_img || req.body.review_img === '') &&
         review.review_img &&
         review.review_img !== req.body.review_img &&
         !/default\/.*/gm.test(review.review_img)
@@ -71,6 +71,8 @@ const ReviewController = {
         const dir = path.resolve("./images");
         await unlink(path.join(dir, review.review_img));
       }
+
+      console.log(req.body);
 
       await Review.update(
         {
