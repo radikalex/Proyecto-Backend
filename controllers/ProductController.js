@@ -194,7 +194,7 @@ const ProductController = {
   async getProductsQuery(req, res) {
     try {
       const products = await Product.findAll({
-        include: [Review],
+        include: [Review, Category],
         where: {
           category_id: req.query.category,
           name: {

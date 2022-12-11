@@ -1,5 +1,7 @@
 /node_modules
 
 /config/config.json
-/images
+/images/user_images/uploads/
+/images/reviews_images/uploads/
+/images/products_images/uploads/
 /product_images/uploads

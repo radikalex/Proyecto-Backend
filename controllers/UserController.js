@@ -8,6 +8,7 @@ const UserController = {
   async createUser(req, res) {
     try {
       req.body.role = "user";
+      req.body.user_img = "users_images/default/user-icon.png"
       const password = bcrypt.hashSync(req.body.password, 10);
       const user = await User.create({ ...req.body, password: password });
       res.status(201).send({ ok:true, msg: "User created succesfully", user });
