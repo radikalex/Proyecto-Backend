@@ -107,7 +107,7 @@ const UserController = {
     try {
       const user = await User.findByPk(req.user.id, {
         attributes: {
-          exclude: [ "password", "role", "createdAt", "updatedAt"],
+          exclude: [ "password", "createdAt", "updatedAt"],
         },
         include: [
           {
